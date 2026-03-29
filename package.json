@@ -1,0 +1,14 @@
+{
+  "name": "plane-truss-analysis",
+  "private": true,
+  "scripts": {
+    "build": "npx tailwindcss -i ./app/static/css/src/input.css -o ./app/static/css/dist/styles.css --config ./tailwind.config.js --minify",
+    "watch": "npx tailwindcss -i ./app/static/css/src/input.css -o ./app/static/css/dist/styles.css --config ./tailwind.config.js --watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^3.4.17"
+  }
+}

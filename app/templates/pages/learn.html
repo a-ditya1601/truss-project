@@ -1,0 +1,220 @@
+{% extends "base/layout.html" %}
+{% from "components/learn_macros.html" import section_block, callout_box, formula_block, truss_type_card %}
+
+{% block title %}Learn the Fundamentals | Plane Truss Analysis{% endblock %}
+
+{% block content %}
+<div class="space-y-10" data-learn-page>
+    <section class="relative overflow-hidden rounded-[2rem] border border-white/10 bg-black/60 px-6 py-12 shadow-[0_24px_60px_rgba(6,11,20,0.42)] backdrop-blur-md sm:px-8 sm:py-16">
+        <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 h-40 bg-[radial-gradient(circle_at_top,rgba(255,138,61,0.16),transparent_62%)]"></div>
+        <div class="relative mx-auto max-w-4xl space-y-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.28em] text-gray-500">Learn the Fundamentals</p>
+            <h1 class="max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">Build intuition before you build the model.</h1>
+            <p class="max-w-2xl text-base leading-7 text-gray-400">
+                A focused guide to the structural ideas behind plane truss analysis, written to feel like a modern engineering notebook rather than a dense textbook.
+            </p>
+        </div>
+    </section>
+
+    <div class="mx-auto flex max-w-[88rem] flex-col gap-8 lg:flex-row lg:items-start lg:gap-12 xl:gap-16">
+        <aside class="lg:sticky lg:top-20 lg:h-fit lg:w-[18.75rem] lg:flex-shrink-0 xl:w-[20rem]">
+            <div class="rounded-[2rem] border border-white/10 bg-black/55 p-6 shadow-[0_18px_48px_rgba(6,11,20,0.32)] backdrop-blur-md xl:p-7">
+                <div class="space-y-2 border-b border-white/10 pb-4">
+                    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Contents</p>
+                    <h2 class="text-lg font-semibold tracking-tight text-white">Learn Path</h2>
+                    <p class="text-sm leading-6 text-slate-400">Follow the core concepts in the order most engineers first learn them.</p>
+                </div>
+
+                <div class="mt-4 h-1 overflow-hidden rounded-full bg-white/5">
+                    <div id="learn-progress-indicator" class="h-full w-0 rounded-full bg-gradient-to-r from-[#ff8a3d] to-white/60 transition-all duration-200"></div>
+                </div>
+
+                <nav class="mt-5 space-y-1" aria-label="Learn sections">
+                    <a href="#what-is-a-truss" data-learn-nav-link class="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-white/5 hover:text-white">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#ff8a3d]">1</span>
+                        <span>What is a Truss</span>
+                    </a>
+                    <a href="#method-of-joints" data-learn-nav-link class="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-white/5 hover:text-white">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#ff8a3d]">2</span>
+                        <span>Method of Joints</span>
+                    </a>
+                    <a href="#determinacy" data-learn-nav-link class="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-white/5 hover:text-white">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#ff8a3d]">3</span>
+                        <span>Determinate vs Indeterminate</span>
+                    </a>
+                    <a href="#stiffness-method" data-learn-nav-link class="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-white/5 hover:text-white">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#ff8a3d]">4</span>
+                        <span>Stiffness Method</span>
+                    </a>
+                    <a href="#types-of-trusses" data-learn-nav-link class="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-white/5 hover:text-white">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#ff8a3d]">5</span>
+                        <span>Types of Trusses</span>
+                    </a>
+                    <a href="#material-properties" data-learn-nav-link class="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-300 transition-all duration-200 hover:bg-white/5 hover:text-white">
+                        <span class="flex h-8 w-8 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-[#ff8a3d]">6</span>
+                        <span>Material Properties</span>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <main class="min-w-0 flex-1 pb-24">
+            <div class="mx-auto flex max-w-[54rem] flex-col gap-8 xl:max-w-[58rem]">
+                {% call section_block("what-is-a-truss", "Section 1", "What Is a Truss?", "A truss is a framework of straight members connected at joints so that loads move through simple axial force paths. In the idealized form used for analysis, members carry only tension or compression.") %}
+                <div class="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+                    <div class="space-y-4 text-base leading-7 text-slate-300">
+                        <p>Plane trusses appear wherever engineers want strength with efficient material use. The form is common because it turns complicated load transfer into a clean network of axial members.</p>
+                        <div class="space-y-3">
+                            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Common applications</p>
+                            <ul class="space-y-2 text-sm text-slate-300">
+                                <li>Bridge spans that need long, efficient load paths.</li>
+                                <li>Roof systems that stay light while covering large areas.</li>
+                                <li>Towers, masts, and industrial support frames.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl border border-dashed border-white/10 bg-black/45 p-5">
+                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Core assumptions</p>
+                        <div class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+                            <p>Pin joints connect members.</p>
+                            <p>Loads act at the joints.</p>
+                            <p>Members resist axial force only.</p>
+                        </div>
+                    </div>
+                </div>
+                {{ callout_box("insight", "A truss is really a force-routing system.", "Once you start seeing members as paths for tension and compression, the geometry becomes much easier to read.") }}
+                {{ callout_box("mistake", "Loads do not belong arbitrarily on members.", "If a load is applied between joints, it must be converted into equivalent joint effects before the truss assumptions are strictly valid.") }}
+                {% endcall %}
+
+                {% call section_block("method-of-joints", "Section 2", "Method of Joints", "The method of joints solves a truss one connection at a time. At each joint, you write equilibrium in the horizontal and vertical directions and solve the unknown member forces.") %}
+                <div class="space-y-4">
+                    {{ formula_block("ΣFx = 0   and   ΣFy = 0", "Every isolated joint must satisfy equilibrium in both directions.") }}
+                    <div class="rounded-2xl border border-white/10 bg-black/45 p-6">
+                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Step-by-step example</p>
+                        <div class="mt-4 space-y-4 text-sm leading-6 text-slate-300">
+                            <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3">1. Solve the support reactions from the global loading.</div>
+                            <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3">2. Pick a joint with at most two unknown member forces.</div>
+                            <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3">3. Assume unknown member forces act away from the joint.</div>
+                            <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3">4. Write ΣFx = 0 and ΣFy = 0, then solve the unknowns.</div>
+                            <div class="rounded-xl border border-white/10 bg-white/5 px-4 py-3">5. Move to the next solvable joint and repeat until all member forces are known.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid gap-4 md:grid-cols-2">
+                    {{ callout_box("insight", "Signs carry meaning.", "A positive result under your assumed convention means tension. A negative result means compression.") }}
+                    {{ callout_box("mistake", "Do not guess tension or compression first.", "Assume a direction consistently, solve the equations, and let the sign reveal the real force state.") }}
+                </div>
+                {% endcall %}
+
+                {% call section_block("determinacy", "Section 3", "Determinate vs Indeterminate", "Before solving, engineers quickly check whether a truss has the right number of members and reactions for equilibrium-based analysis.") %}
+                {{ formula_block("m + r = 2j", "m = members, r = reactions, j = joints") }}
+                <div class="grid gap-4 md:grid-cols-3">
+                    <div class="rounded-2xl border border-white/10 bg-black/45 p-5">
+                        <p class="text-sm font-semibold text-white">Determinate</p>
+                        <p class="mt-2 text-sm leading-6 text-gray-400">If m + r = 2j, the truss has just enough unknowns to solve from statics alone.</p>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-black/45 p-5">
+                        <p class="text-sm font-semibold text-white">Indeterminate</p>
+                        <p class="mt-2 text-sm leading-6 text-gray-400">If m + r &gt; 2j, extra unknowns exist and equilibrium alone is not enough.</p>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-black/45 p-5">
+                        <p class="text-sm font-semibold text-white">Unstable</p>
+                        <p class="mt-2 text-sm leading-6 text-gray-400">If m + r &lt; 2j, the structure lacks the restraint or connectivity needed to hold shape.</p>
+                    </div>
+                </div>
+                {{ callout_box("insight", "The count is a fast filter, not a full guarantee.", "A truss can satisfy the equation and still behave poorly if the geometry itself is unstable.") }}
+                {% endcall %}
+
+                {% call section_block("stiffness-method", "Section 4", "Why the Stiffness Method Is Used", "The method of joints builds intuition, but the stiffness method is what makes modern analysis software scalable, systematic, and dependable for larger trusses.") %}
+                <div class="space-y-4 text-base leading-7 text-slate-300">
+                    <p>Instead of solving one joint at a time, the stiffness method assembles the full structural system. Each member contributes stiffness to a global matrix, the solver computes nodal displacements first, and then member forces and reactions are recovered from that displacement field.</p>
+                    <div class="grid gap-4 md:grid-cols-3">
+                        <div class="rounded-2xl border border-white/10 bg-black/45 p-5">
+                            <p class="text-sm font-semibold text-white">1. Assemble stiffness</p>
+                            <p class="mt-2 text-sm leading-6 text-slate-400">Each member contributes directional resistance to the full structure.</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-black/45 p-5">
+                            <p class="text-sm font-semibold text-white">2. Solve displacements</p>
+                            <p class="mt-2 text-sm leading-6 text-slate-400">The unknown nodal movements are solved for the entire structure at once.</p>
+                        </div>
+                        <div class="rounded-2xl border border-white/10 bg-black/45 p-5">
+                            <p class="text-sm font-semibold text-white">3. Recover forces</p>
+                            <p class="mt-2 text-sm leading-6 text-slate-400">Member forces and support reactions follow directly from the displacement results.</p>
+                        </div>
+                    </div>
+                </div>
+                {{ callout_box("insight", "Displacements are the bridge between load and force.", "That is why stiffness methods stay powerful even when the truss becomes too large for hand calculations.") }}
+                {% endcall %}
+
+                {% call section_block("types-of-trusses", "Section 5", "Types of Trusses", "Different truss families are not just different drawings. Their diagonal patterns change which members tend to attract tension or compression under common loading.") %}
+                <div class="grid gap-5 xl:grid-cols-3">
+                    {% call truss_type_card("Pratt Truss", "Quick Builder", "Pratt trusses place the diagonals so they visually lean toward the center. Under common gravity loading, those diagonals often act efficiently in tension.", "Bridge trusses and repetitive steel spans.", "A reliable pattern when downward loading dominates.", "0ms") %}
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-xs uppercase tracking-[0.22em] text-slate-500">
+                            <span>Diagonal logic</span>
+                            <span>Toward center</span>
+                        </div>
+                        <svg viewBox="0 0 220 120" class="w-full" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M20 96H200" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M52 96L84 44L116 44L148 44L180 96" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M52 96V44M84 96V44M116 96V44M148 96V44M180 96V44" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M20 96L52 44M52 96L84 44M148 44L180 96M116 44L148 96" stroke="#ff8a3d" stroke-width="4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    {% endcall %}
+
+                    {% call truss_type_card("Howe Truss", "Quick Builder", "Howe trusses reverse the Pratt orientation. Their diagonals lean away from the center, often placing those members in compression under gravity loading.", "Timber trusses and historic roof or bridge systems.", "Useful when compression-friendly diagonal behavior is desired.", "90ms") %}
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-xs uppercase tracking-[0.22em] text-slate-500">
+                            <span>Diagonal logic</span>
+                            <span>Away from center</span>
+                        </div>
+                        <svg viewBox="0 0 220 120" class="w-full" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M20 96H200" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M52 96L84 44L116 44L148 44L180 96" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M52 96V44M84 96V44M116 96V44M148 96V44M180 96V44" stroke="#475569" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M52 44L84 96M84 44L116 96M116 96L148 44M148 96L180 44" stroke="#ff8a3d" stroke-width="4" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    {% endcall %}
+
+                    {% call truss_type_card("Warren Truss", "Quick Builder", "Warren trusses use a repeating triangular rhythm. The alternating diagonal pattern creates the familiar zig-zag look with a very clean visual cadence.", "Lightweight bridges, roof systems, and repetitive spans.", "Efficient load sharing through alternating triangles.", "180ms") %}
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-xs uppercase tracking-[0.22em] text-slate-500">
+                            <span>Diagonal logic</span>
+                            <span>Zig-zag</span>
+                        </div>
+                        <svg viewBox="0 0 220 120" class="w-full" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M20 96H200" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+                            <path d="M20 96L52 44L84 96L116 44L148 96L180 44L200 96" stroke="#ff8a3d" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    {% endcall %}
+                </div>
+                {% endcall %}
+
+                {% call section_block("material-properties", "Section 6", "Effect of Material Properties", "Material properties do not change the geometry of the truss, but they strongly influence how much the structure deforms and how stiffness is distributed through the model.") %}
+                <div class="grid gap-5 md:grid-cols-2">
+                    <div class="rounded-2xl border border-white/10 bg-black/45 p-6">
+                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Young's Modulus</p>
+                        <h3 class="mt-2 text-xl font-semibold tracking-tight text-white">E</h3>
+                        <p class="mt-3 text-sm leading-6 text-slate-300">Young's modulus describes how stiff the material itself is. Higher E usually means lower displacement under the same loading.</p>
+                    </div>
+                    <div class="rounded-2xl border border-white/10 bg-black/45 p-6">
+                        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Cross-sectional Area</p>
+                        <h3 class="mt-2 text-xl font-semibold tracking-tight text-white">A</h3>
+                        <p class="mt-3 text-sm leading-6 text-slate-300">Area changes the axial stiffness of each member. Larger A means the member resists elongation or shortening more strongly.</p>
+                    </div>
+                </div>
+                {{ formula_block("Member axial stiffness ∝ E × A", "Geometry often governs force paths, while stiffness strongly governs deformation.") }}
+                <div class="grid gap-4 md:grid-cols-2">
+                    {{ callout_box("insight", "Force path and deformation are related but not identical.", "Geometry usually dominates the overall force path, while stiffness changes how much the structure moves under that load path.") }}
+                    {{ callout_box("mistake", "A stronger member does not always mean lower force.", "A stiffer member can attract more load because it resists deformation more effectively than its neighbors.") }}
+                </div>
+                {% endcall %}
+            </div>
+        </main>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/ui/learn.js') }}" defer></script>
+{% endblock %}

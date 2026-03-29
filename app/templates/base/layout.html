@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+    {% include "base/head.html" %}
+</head>
+<body class="overflow-x-hidden">
+    <div class="relative isolate min-h-screen">
+        <div aria-hidden="true" class="pointer-events-none absolute inset-0 hidden dark:block">
+            <div class="absolute inset-x-0 top-[-20rem] h-[34rem] bg-[radial-gradient(circle_at_top,rgba(255,140,80,0.05),transparent_60%)]"></div>
+            <div class="absolute right-[-8rem] top-24 h-72 w-72 rounded-full bg-white/[0.02] blur-3xl"></div>
+            <div class="absolute left-[-8rem] bottom-[-4rem] h-80 w-80 rounded-full bg-accent/[0.04] blur-3xl"></div>
+        </div>
+
+        <main class="ui-shell relative z-10">
+            {% include "components/navbar.html" %}
+            <div class="mt-8">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+{% macro step_card(step, title, description, delay='0ms') -%}
+<article class="group ui-reveal relative overflow-hidden rounded-2xl border border-white/10 bg-black/50 p-6 shadow-[0_18px_50px_rgba(6,11,20,0.35)] backdrop-blur-md transition-all duration-200 hover:-translate-y-1 hover:scale-105 hover:border-white/20 hover:shadow-[0_0_24px_rgba(255,138,61,0.12)]" data-reveal style="transition-delay: {{ delay }};">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-x-10 top-0 h-24 bg-[radial-gradient(circle_at_top,rgba(255,138,61,0.18),transparent_65%)] opacity-0 transition-opacity duration-200 group-hover:opacity-100"></div>
+    <div class="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-[#ff8a3d] shadow-inner">
+        {{ caller() }}
+    </div>
+    <div class="relative mt-6 space-y-3">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">{{ step }}</p>
+        <h3 class="text-xl font-semibold tracking-tight text-white">{{ title }}</h3>
+        <p class="text-sm leading-6 text-slate-300">{{ description }}</p>
+    </div>
+</article>
+{%- endmacro %}
+
+{% macro section_block(id, label, title, intro, delay='0ms') -%}
+<section id="{{ id }}" data-learn-section class="ui-reveal scroll-mt-28 space-y-6 rounded-[1.75rem] border border-white/10 bg-black/50 p-6 shadow-[0_18px_48px_rgba(6,11,20,0.32)] backdrop-blur-md sm:p-8" data-reveal style="transition-delay: {{ delay }};">
+    <div class="space-y-3">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">{{ label }}</p>
+        <h2 class="text-2xl font-semibold tracking-tight text-white sm:text-3xl">{{ title }}</h2>
+        <p class="max-w-3xl text-base leading-7 text-gray-400">{{ intro }}</p>
+    </div>
+    {{ caller() }}
+</section>
+{%- endmacro %}
+
+{% macro callout_box(kind, title, body) -%}
+{% if kind == "insight" %}
+    {% set classes = "border-[#ff8a3d]/20 bg-[#ff8a3d]/10 text-orange-50" %}
+    {% set badge = "Insight" %}
+    {% set icon = "💡" %}
+{% else %}
+    {% set classes = "border-white/12 bg-white/[0.04] text-zinc-100" %}
+    {% set badge = "Common Mistake" %}
+    {% set icon = "⚠️" %}
+{% endif %}
+<div class="rounded-2xl border px-5 py-4 {{ classes }}">
+    <div class="flex items-start gap-3">
+        <span class="text-lg leading-none">{{ icon }}</span>
+        <div class="space-y-1">
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] opacity-80">{{ badge }}</p>
+            <h3 class="text-sm font-semibold">{{ title }}</h3>
+            <p class="text-sm leading-6 opacity-90">{{ body }}</p>
+        </div>
+    </div>
+</div>
+{%- endmacro %}
+
+{% macro formula_block(formula, caption='') -%}
+<div class="rounded-2xl border border-white/10 bg-black/60 px-5 py-4 shadow-inner">
+    <p class="font-mono text-lg tracking-tight text-[#ff8a3d]">{{ formula }}</p>
+    {% if caption %}
+    <p class="mt-2 text-sm text-gray-400">{{ caption }}</p>
+    {% endif %}
+</div>
+{%- endmacro %}
+
+{% macro truss_type_card(title, subtitle, description, use_case, behavior, delay='0ms') -%}
+<article class="ui-reveal overflow-hidden rounded-2xl border border-white/10 bg-black/50 p-6 shadow-[0_18px_48px_rgba(6,11,20,0.28)] backdrop-blur-md transition-all duration-200 hover:-translate-y-1 hover:border-white/20" data-reveal style="transition-delay: {{ delay }};">
+    <div class="space-y-4">
+        <div class="space-y-2">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">{{ subtitle }}</p>
+            <h3 class="text-xl font-semibold tracking-tight text-white">{{ title }}</h3>
+        </div>
+        <div class="rounded-2xl border border-dashed border-white/10 bg-black/45 p-4">
+            {{ caller() }}
+        </div>
+        <p class="text-sm leading-6 text-gray-400">{{ description }}</p>
+        <div class="space-y-2 text-sm text-gray-400">
+            <p><span class="font-semibold text-gray-200">Used for:</span> {{ use_case }}</p>
+            <p><span class="font-semibold text-gray-200">Behavior:</span> {{ behavior }}</p>
+        </div>
+    </div>
+</article>
+{%- endmacro %}

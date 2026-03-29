@@ -1,0 +1,100 @@
+<section id="results" class="ui-card ui-section ui-results-enter hidden rounded-[2rem] translate-y-3 opacity-0 transition-all duration-200" data-results-panel aria-hidden="true">
+    <div class="flex flex-col gap-4 border-b border-white/10 pb-6 lg:flex-row lg:items-start lg:justify-between">
+        <div class="space-y-2">
+            <p class="ui-label">Results</p>
+            <h2 class="ui-heading text-2xl">Member Force Summary</h2>
+            <p class="ui-body max-w-2xl">Review truss classification, member force distribution, and a method-of-joints explanation when the structure is statically determinate.</p>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:flex-row">
+            <button id="results-export-button" type="button" class="ui-btn ui-btn-secondary min-w-32 opacity-60 cursor-not-allowed" disabled>
+                Export
+            </button>
+        </div>
+    </div>
+
+    <div id="results-status-message" class="mt-6 hidden rounded-2xl border px-4 py-3 text-sm font-medium">
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-4">
+        <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-5">
+            <p class="ui-label">Truss Type</p>
+            <div class="mt-3">
+                <span id="results-truss-type-badge" class="inline-flex rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-sm font-semibold text-gray-200">
+                    Pending
+                </span>
+            </div>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-5">
+            <p class="ui-label">m</p>
+            <p id="results-parameter-m" class="mt-3 text-2xl font-semibold text-gray-900 dark:text-white">-</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-5">
+            <p class="ui-label">j</p>
+            <p id="results-parameter-j" class="mt-3 text-2xl font-semibold text-gray-900 dark:text-white">-</p>
+        </div>
+
+        <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-5">
+            <p class="ui-label">r</p>
+            <p id="results-parameter-r" class="mt-3 text-2xl font-semibold text-gray-900 dark:text-white">-</p>
+        </div>
+    </div>
+
+    <div class="mt-6 rounded-[1.5rem] border border-white/10 bg-black/45 p-2">
+        <div class="flex flex-wrap gap-2">
+            <button type="button" data-results-tab="results" class="ui-btn ui-btn-secondary border-transparent bg-white/[0.08] shadow-none dark:text-white">
+                Results
+            </button>
+            <button type="button" data-results-tab="explanation" class="ui-btn ui-btn-secondary border-transparent bg-transparent shadow-none dark:bg-transparent dark:text-gray-300">
+                Explanation
+            </button>
+        </div>
+    </div>
+
+    <div id="results-tab-panel-results" data-results-tab-panel="results" class="mt-6 space-y-6">
+        <div id="results-analysis-visualizer-panel" class="hidden rounded-[1.75rem] border border-white/10 bg-black/45 p-6">
+            <div class="space-y-2 border-b border-white/10 pb-4">
+                <p class="ui-label">Output Visualizer</p>
+                <h3 class="ui-heading text-xl">Analysis force map</h3>
+                <p class="ui-body text-sm">Read-only member force visualization generated from the latest solver response.</p>
+            </div>
+
+            <div id="results-analysis-visualizer-shell" class="relative mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/70">
+                <div id="analysis-visualizer" class="h-[420px] w-full"></div>
+                <div id="analysis-visualizer-legend" class="pointer-events-none absolute bottom-4 right-4 hidden rounded-xl border border-white/10 bg-slate-950/80 px-3 py-2 text-xs text-slate-200 shadow-lg backdrop-blur-sm"></div>
+                <div id="analysis-visualizer-tooltip" class="pointer-events-none absolute hidden rounded-xl border border-white/10 bg-slate-950/90 px-3 py-2 text-xs text-slate-100 shadow-lg backdrop-blur-sm"></div>
+            </div>
+        </div>
+
+        <div class="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/50">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-white/10">
+                    <thead class="bg-white/[0.04]">
+                        <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            <th class="px-4 py-3">Member ID</th>
+                            <th class="px-4 py-3 text-right">Force (kN)</th>
+                            <th class="px-4 py-3">Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-member-table-body" class="divide-y divide-gray-200 dark:divide-white/10">
+                        <tr>
+                            <td colspan="3" class="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                                No analysis results available yet.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="results-tab-panel-explanation" data-results-tab-panel="explanation" class="mt-6 hidden space-y-6">
+        <div id="results-explanation-content" class="space-y-4">
+            <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-6">
+                <p class="ui-body">Method-of-joints explanation will appear here after a successful analysis.</p>
+            </div>
+        </div>
+    </div>
+</section>

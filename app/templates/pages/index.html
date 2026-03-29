@@ -1,0 +1,306 @@
+{% extends "base/layout.html" %}
+{% from "components/button_macros.html" import star_button %}
+
+{% block title %}Home | Plane Truss Analysis{% endblock %}
+
+{% block content %}
+<div class="space-y-0 pb-16">
+    <!-- ═══════════════════════════════════════════
+         SECTION 1 — HERO
+         ═══════════════════════════════════════════ -->
+    <section class="relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
+        <!-- Radial light orbs -->
+        <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+            <div class="orb absolute left-1/2 top-[-180px] h-[800px] w-[800px] animate-orb-pulse blur-[80px]"></div>
+            <div class="orb absolute bottom-[-240px] left-1/2 h-[700px] w-[700px] animate-orb-pulse-slow blur-[100px]" style="animation-delay: 3s;"></div>
+            <div class="orb-cool absolute left-1/2 top-[30%] h-[500px] w-[500px] -translate-x-1/2 blur-[120px]"></div>
+        </div>
+
+        <div class="relative mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-8 px-6 text-center">
+            <div class="space-y-2">
+                <p class="hero-stagger animate-hero-fade-in mb-5 text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">PLANE TRUSS ANALYSIS</p>
+                <div class="space-y-1 leading-tight">
+                    <h1 class="hero-stagger animate-hero-fade-in-delay text-5xl font-bold leading-tight text-white md:text-7xl lg:text-[5rem]">
+                        Build and Analyze
+                    </h1>
+                    <h1 class="hero-stagger animate-hero-fade-in-delay-2 hero-glow-text text-5xl font-bold leading-tight text-white md:text-7xl lg:text-[5rem]">
+                        Trusses Visually
+                    </h1>
+                </div>
+                <p class="hero-stagger animate-hero-fade-in-delay-3 mx-auto mt-6 max-w-xl text-lg leading-8 text-zinc-400">
+                    Design, simulate, and understand structures in seconds.
+                </p>
+            </div>
+
+            <div class="hero-stagger animate-hero-fade-in-delay-3 flex flex-col gap-4 sm:flex-row">
+                <a href="{{ url_for('web.analysis_page') }}" class="inline-flex items-center justify-center rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-black transition-all duration-300 hover:scale-105 hover:brightness-110" style="box-shadow: 0 0 30px rgba(255,140,80,0.2);">
+                    Start Building
+                </a>
+                <a href="{{ url_for('web.learn_page') }}" class="inline-flex items-center justify-center rounded-full border border-white/[0.12] px-7 py-3.5 text-sm font-medium text-white transition-all duration-300 hover:border-white/[0.25] hover:bg-white/[0.04]">
+                    Learn Fundamentals
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 2 — GET STARTED IN 60 SECONDS
+         ═══════════════════════════════════════════ -->
+    <section class="relative overflow-hidden py-28">
+        <!-- Subtle background orb -->
+        <div aria-hidden="true" class="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2">
+            <div class="orb-cool h-full w-full blur-[120px]"></div>
+        </div>
+
+        <div class="ui-reveal relative mx-auto max-w-6xl space-y-12 px-6" data-reveal>
+            <div class="mx-auto max-w-3xl space-y-4 text-center">
+                <p class="section-label">Get Started in 60 Seconds</p>
+                <h2 class="section-heading">A simple workflow from model setup to solved results.</h2>
+                <p class="section-body">
+                    Move through the essentials in order and keep the whole process easy to read.
+                </p>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <article class="landing-card group">
+                    <p class="text-sm font-medium text-zinc-600 transition-colors group-hover:text-accent">01</p>
+                    <h3 class="mt-4 text-lg font-semibold text-white">Choose Mode</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Start with Preset Builder for speed or Manual Build for full control over geometry.</p>
+                </article>
+                <article class="landing-card group">
+                    <p class="text-sm font-medium text-zinc-600 transition-colors group-hover:text-accent">02</p>
+                    <h3 class="mt-4 text-lg font-semibold text-white">Create Truss</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Generate a standard truss or place nodes and members directly on the editor canvas.</p>
+                </article>
+                <article class="landing-card group">
+                    <p class="text-sm font-medium text-zinc-600 transition-colors group-hover:text-accent">03</p>
+                    <h3 class="mt-4 text-lg font-semibold text-white">Add Supports</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Define pinned and roller constraints so the structure is restrained correctly.</p>
+                </article>
+                <article class="landing-card group">
+                    <p class="text-sm font-medium text-zinc-600 transition-colors group-hover:text-accent">04</p>
+                    <h3 class="mt-4 text-lg font-semibold text-white">Apply Loads</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Use joint loads directly or place member loads and let the app handle the conversion internally.</p>
+                </article>
+                <article class="landing-card group">
+                    <p class="text-sm font-medium text-zinc-600 transition-colors group-hover:text-accent">05</p>
+                    <h3 class="mt-4 text-lg font-semibold text-white">Solve</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Run the stiffness-based analysis once the truss, supports, and loads all look correct.</p>
+                </article>
+                <article class="landing-card group">
+                    <p class="text-sm font-medium text-zinc-600 transition-colors group-hover:text-accent">06</p>
+                    <h3 class="mt-4 text-lg font-semibold text-white">View Results</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Review member forces, support reactions, and nodal displacements in a structured output panel.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 3 — WHY THIS TOOL?
+         ═══════════════════════════════════════════ -->
+    <section class="relative py-24">
+        <div class="ui-reveal mx-auto grid max-w-6xl gap-12 px-6 lg:grid-cols-[0.92fr_1.08fr] lg:items-start" data-reveal>
+            <div class="space-y-4">
+                <p class="section-label">Why This Tool?</p>
+                <h2 class="section-heading">Built for clear structural thinking.</h2>
+                <p class="section-body">
+                    The interface is designed to support the real engineering workflow: define geometry, assign restraints, apply loads, solve, and review.
+                </p>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-3">
+                <div class="landing-card">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 3L4 14H11L10 21L20 9H13L12 3Z"></path>
+                        </svg>
+                    </span>
+                    <h3 class="mt-5 text-lg font-semibold text-white">Fast Analysis</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Move from geometry to solved output quickly with a workflow built around focused structural review.</p>
+                </div>
+
+                <div class="landing-card">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 18L12 6L20 18"></path>
+                            <path d="M7 14H17"></path>
+                        </svg>
+                    </span>
+                    <h3 class="mt-5 text-lg font-semibold text-white">Interactive Building</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Create trusses visually with preset and manual workflows that keep the model easy to inspect.</p>
+                </div>
+
+                <div class="landing-card">
+                    <span class="flex h-11 w-11 items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 19V10"></path>
+                            <path d="M12 19V5"></path>
+                            <path d="M19 19V13"></path>
+                        </svg>
+                    </span>
+                    <h3 class="mt-5 text-lg font-semibold text-white">Visual Results</h3>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Read member forces, reactions, and displacements in a clean format designed for fast understanding.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 4 — DESIGN STRUCTURES VISUALLY
+         ═══════════════════════════════════════════ -->
+    <section class="relative overflow-hidden py-24">
+        <!-- Background orb behind preview -->
+        <div aria-hidden="true" class="pointer-events-none absolute right-[-10%] top-1/2 h-[500px] w-[500px] -translate-y-1/2">
+            <div class="orb h-full w-full blur-[100px]" style="opacity: 0.3;"></div>
+        </div>
+
+        <div class="ui-reveal mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center" data-reveal>
+            <div class="space-y-5">
+                <p class="section-label">Live Preview</p>
+                <h2 class="section-heading">Design structures visually</h2>
+                <p class="section-body">
+                    Build your truss directly on the canvas. No forms. No complexity.
+                </p>
+                {{ star_button(url_for('web.analysis_page'), 'Start Building') }}
+            </div>
+
+            <div class="rounded-[2rem] border border-white/[0.08] bg-white/[0.02] p-6 backdrop-blur-md">
+                <div id="landing-truss-preview" data-landing-preview class="rounded-[1.5rem] border border-white/[0.06] bg-black/50 p-5">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm font-semibold text-white">Animated Preview</p>
+                        <span class="text-[11px] uppercase tracking-[0.2em] text-zinc-600">Visual Demo</span>
+                    </div>
+                    <div class="mt-5 h-72 rounded-2xl border border-white/[0.06] bg-[#030303] p-4">
+                        <svg viewBox="0 0 420 240" class="h-full w-full" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <defs>
+                                <filter id="previewMemberGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="2.5" result="blur"></feGaussianBlur>
+                                    <feMerge>
+                                        <feMergeNode in="blur"></feMergeNode>
+                                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+
+                            <g opacity="0.2">
+                                <path d="M20 48H400" stroke="#1E293B" stroke-width="1"></path>
+                                <path d="M20 96H400" stroke="#1E293B" stroke-width="1"></path>
+                                <path d="M20 144H400" stroke="#1E293B" stroke-width="1"></path>
+                                <path d="M20 192H400" stroke="#1E293B" stroke-width="1"></path>
+                                <path d="M60 24V216" stroke="#1E293B" stroke-width="1"></path>
+                                <path d="M120 24V216" stroke="#1E293B" stroke-width="1"></path>
+                                <path d="M180 24V216" stroke="#1E293B" stroke-width="1"></path>
+                                <path d="M240 24V216" stroke="#1E293B" stroke-width="1"></path>
+                                <path d="M300 24V216" stroke="#1E293B" stroke-width="1"></path>
+                                <path d="M360 24V216" stroke="#1E293B" stroke-width="1"></path>
+                            </g>
+
+                            <g stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M48 176L108 176" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+                                <path d="M108 176L168 176" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+                                <path d="M168 176L228 176" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+                                <path d="M228 176L288 176" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+                                <path d="M288 176L348 176" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+
+                                <path d="M108 88L168 88" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+                                <path d="M168 88L228 88" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+                                <path d="M228 88L288 88" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+
+                                <path d="M108 176L108 88" data-preview-member style="stroke:#64748B;stroke-width:2.8;"></path>
+                                <path d="M168 176L168 88" data-preview-member style="stroke:#64748B;stroke-width:2.8;"></path>
+                                <path d="M228 176L228 88" data-preview-member style="stroke:#64748B;stroke-width:2.8;"></path>
+                                <path d="M288 176L288 88" data-preview-member style="stroke:#64748B;stroke-width:2.8;"></path>
+
+                                <path d="M48 176L108 88" data-preview-member data-highlight="tension" style="stroke:#64748B;stroke-width:3.2;"></path>
+                                <path d="M108 176L168 88" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+                                <path d="M228 88L288 176" data-preview-member data-highlight="compression" style="stroke:#64748B;stroke-width:3.2;"></path>
+                                <path d="M288 88L348 176" data-preview-member style="stroke:#64748B;stroke-width:3.2;"></path>
+                            </g>
+
+                            <g>
+                                <path d="M48 190L30 214H66L48 190Z" fill="#94A3B8"></path>
+                                <path d="M332 190L314 214H350L332 190Z" fill="#94A3B8"></path>
+                                <circle cx="324" cy="216" r="4" fill="#CBD5E1"></circle>
+                                <circle cx="340" cy="216" r="4" fill="#CBD5E1"></circle>
+                            </g>
+
+                            <g data-preview-load style="opacity:0;transform:translateY(-14px);transform-origin:228px 58px;transition:opacity 420ms ease-in-out, transform 420ms ease-in-out;">
+                                <path d="M228 36V76" stroke="#60A5FA" stroke-width="4" stroke-linecap="round"></path>
+                                <path d="M217 61L228 76L239 61" stroke="#60A5FA" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </g>
+
+                            <g fill="#E2E8F0">
+                                <circle cx="48" cy="176" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                                <circle cx="108" cy="88" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                                <circle cx="108" cy="176" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                                <circle cx="168" cy="88" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                                <circle cx="168" cy="176" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                                <circle cx="228" cy="88" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                                <circle cx="228" cy="176" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                                <circle cx="288" cy="88" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                                <circle cx="288" cy="176" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                                <circle cx="348" cy="176" r="5" data-preview-node style="opacity:0;transition:opacity 260ms ease-in-out;"></circle>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 5 — LEARN FUNDAMENTALS
+         ═══════════════════════════════════════════ -->
+    <section class="relative py-24">
+        <div class="ui-reveal mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1fr_1fr] lg:items-center" data-reveal>
+            <div class="space-y-5">
+                <p class="section-label">Learn Fundamentals</p>
+                <h2 class="section-heading">Understand the theory behind the structure</h2>
+                <p class="section-body">
+                    Explore concepts like method of joints, stiffness method, and truss behavior.
+                </p>
+                <a href="{{ url_for('web.learn_page') }}" class="inline-flex items-center justify-center rounded-full border border-white/[0.12] bg-transparent px-7 py-3.5 text-sm font-medium text-white transition-all duration-300 hover:border-white/[0.25] hover:bg-white/[0.04]">
+                    Explore Learning
+                </a>
+            </div>
+
+            <div class="grid gap-4 sm:grid-cols-2">
+                <div class="landing-card">
+                    <p class="section-label text-[11px]">Topics</p>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">What is a truss, method of joints, determinacy, stiffness method, truss types, and material properties.</p>
+                </div>
+                <div class="landing-card">
+                    <p class="section-label text-[11px]">Format</p>
+                    <p class="mt-3 text-sm leading-6 text-zinc-400">Sticky navigation, section callouts, formula blocks, and comparison-style explanations.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════
+         SECTION 6 — START NOW CTA
+         ═══════════════════════════════════════════ -->
+    <section class="relative overflow-hidden py-24">
+        <div class="ui-reveal mx-auto max-w-6xl px-6" data-reveal>
+            <div class="relative rounded-[2rem] border border-white/[0.08] bg-white/[0.02] px-6 py-14 backdrop-blur-md sm:px-8 sm:py-20">
+                <!-- Inner radial glow -->
+                <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden rounded-[2rem]">
+                    <div class="orb absolute left-1/2 top-[-100px] h-[400px] w-[400px] blur-[80px]" style="opacity: 0.25;"></div>
+                </div>
+
+                <div class="relative flex flex-col items-center gap-7 text-center">
+                    <div class="max-w-2xl space-y-4">
+                        <p class="section-label">Start Now</p>
+                        <h2 class="section-heading">Start building your first truss</h2>
+                    </div>
+                    {{ star_button(url_for('web.analysis_page'), 'Start Building') }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include "components/footer_section.html" %}
+</div>
+<script src="{{ url_for('static', filename='js/ui/landing-preview.js') }}" defer></script>
+{% endblock %}

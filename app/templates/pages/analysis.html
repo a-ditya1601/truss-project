@@ -1,0 +1,525 @@
+{% extends "base/layout.html" %}
+
+{% block title %}Analysis | Plane Truss Analysis{% endblock %}
+
+{% block content %}
+<div class="grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)]" data-analysis-controls>
+    <aside class="lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto">
+        <div class="ui-card h-full bg-black/55 p-4">
+            <div class="space-y-2 border-b border-white/10 px-3 pb-4">
+                <p class="ui-label">Workspace</p>
+                <h1 class="ui-heading text-2xl">Truss Solver</h1>
+                <p class="ui-body text-sm text-zinc-400">Structured sections for model setup, visualization, and results review.</p>
+            </div>
+
+            <nav class="mt-4 space-y-1" aria-label="Solver sections">
+                <a href="#overview" data-sidebar-link class="ui-sidebar-link ui-sidebar-link-active">
+                    <span class="ui-sidebar-icon">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 12H20"/>
+                            <path d="M12 4V20"/>
+                        </svg>
+                    </span>
+                    <span>Overview</span>
+                </a>
+
+                <a href="#geometry" data-sidebar-link class="ui-sidebar-link">
+                    <span class="ui-sidebar-icon dark:text-[#ff8a3d]">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 18L12 6L19 18"/>
+                            <path d="M7.5 14H16.5"/>
+                        </svg>
+                    </span>
+                    <span>Geometry</span>
+                </a>
+
+                <a href="#materials" data-sidebar-link class="ui-sidebar-link">
+                    <span class="ui-sidebar-icon dark:text-[#ff8a3d]">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 8H20"/>
+                            <path d="M4 12H20"/>
+                            <path d="M4 16H14"/>
+                        </svg>
+                    </span>
+                    <span>Materials</span>
+                </a>
+
+                <a href="#supports" data-sidebar-link class="ui-sidebar-link">
+                    <span class="ui-sidebar-icon dark:text-[#ff8a3d]">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 18H20"/>
+                            <path d="M7 18L12 8L17 18"/>
+                        </svg>
+                    </span>
+                    <span>Supports</span>
+                </a>
+
+                <a href="#loads" data-sidebar-link class="ui-sidebar-link">
+                    <span class="ui-sidebar-icon dark:text-[#ff8a3d]">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 4V16"/>
+                            <path d="M8 12L12 16L16 12"/>
+                            <path d="M5 20H19"/>
+                        </svg>
+                    </span>
+                    <span>Loads</span>
+                </a>
+
+                <a href="#visualization" data-sidebar-link class="ui-sidebar-link">
+                    <span class="ui-sidebar-icon dark:text-[#ff8a3d]">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="4" y="5" width="16" height="14" rx="2"/>
+                            <path d="M8 15L11 12L13.5 14.5L17 10"/>
+                        </svg>
+                    </span>
+                    <span>Visualization</span>
+                </a>
+
+                <a href="#results" data-sidebar-link class="ui-sidebar-link">
+                    <span class="ui-sidebar-icon dark:text-[#ff8a3d]">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 19V9"/>
+                            <path d="M12 19V5"/>
+                            <path d="M19 19V12"/>
+                        </svg>
+                    </span>
+                    <span>Results</span>
+                </a>
+            </nav>
+        </div>
+    </aside>
+
+    <div class="ui-stack-lg min-w-0">
+        <section id="overview" class="ui-card ui-section">
+            <div class="space-y-3">
+                <p class="ui-label">Overview</p>
+                <h2 class="ui-heading text-3xl">Plane truss analysis workspace</h2>
+                <div class="h-px bg-gray-200 dark:bg-white/10"></div>
+            </div>
+
+            <div class="mt-6 grid gap-6 xl:grid-cols-3">
+                <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-5 transition-all duration-300 hover:border-white/20 hover:shadow-[0_12px_32px_rgba(255,138,61,0.08)]">
+                    <p class="ui-label">Model Setup</p>
+                    <p class="ui-body mt-2">Define structural geometry, material assumptions, supports, and load cases in a guided sequence.</p>
+                </div>
+                <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-5 transition-all duration-300 hover:border-white/20 hover:shadow-[0_12px_32px_rgba(255,138,61,0.08)]">
+                    <p class="ui-label">Visualization</p>
+                    <p class="ui-body mt-2">Inspect the truss graphically in a dedicated panel within the main workflow.</p>
+                </div>
+                <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-5 transition-all duration-300 hover:border-white/20 hover:shadow-[0_12px_32px_rgba(255,138,61,0.08)]">
+                    <p class="ui-label">Results Review</p>
+                    <p class="ui-body mt-2">Review truss classification, key parameters, tabulated outputs, and plain-language explanation blocks.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="geometry" class="ui-card ui-section">
+            <div class="space-y-3">
+                <p class="ui-label">Geometry</p>
+                <h2 class="ui-heading text-2xl">Geometry input</h2>
+                <div class="h-px bg-gray-200 dark:bg-white/10"></div>
+            </div>
+
+            <div id="geometry-notification" data-controls-notification class="mt-6 hidden rounded-2xl border px-4 py-3 text-sm font-medium" role="alert" aria-live="polite"></div>
+
+            <div class="mt-6 space-y-6">
+                <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-3 shadow-sm">
+                    <div class="grid gap-2 sm:grid-cols-2">
+                        <button id="geometry-mode-quick" type="button" data-geometry-mode="quick" class="ui-btn ui-btn-secondary justify-center border-transparent bg-transparent shadow-none">
+                            Quick Builder Mode
+                        </button>
+                        <button id="geometry-mode-advanced" type="button" data-geometry-mode="advanced" class="ui-btn ui-btn-secondary justify-center border-transparent bg-white/[0.08] shadow-none">
+                            Advanced Mode
+                        </button>
+                    </div>
+                </div>
+
+                <div id="quick-builder-panel" class="hidden rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <div class="space-y-1 border-b border-white/10 pb-4">
+                        <p class="ui-label">Quick Builder</p>
+                        <h3 class="ui-heading text-xl">Generate a base truss automatically</h3>
+                    </div>
+
+                    <div class="mt-5 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+                        <div>
+                            <label class="ui-label" for="quick-span-length">Span Length</label>
+                            <input id="quick-span-length" class="ui-input mt-3" type="number" step="any" min="1" inputmode="decimal" value="24">
+                        </div>
+                        <div>
+                            <label class="ui-label" for="quick-panel-count">Number of Panels</label>
+                            <input id="quick-panel-count" class="ui-input mt-3" type="number" step="1" min="2" inputmode="numeric" value="6">
+                        </div>
+                        <div>
+                            <label class="ui-label" for="quick-height">Height</label>
+                            <input id="quick-height" class="ui-input mt-3" type="number" step="any" min="1" inputmode="decimal" value="4">
+                        </div>
+                        <div>
+                            <label class="ui-label" for="quick-truss-type">Truss Type</label>
+                            <select id="quick-truss-type" class="ui-input mt-3">
+                                <option value="pratt">Pratt</option>
+                                <option value="howe">Howe</option>
+                                <option value="warren">Warren</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="advanced-geometry-panel" class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <div class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="space-y-1">
+                            <p class="ui-label">Nodes</p>
+                            <h3 class="ui-heading text-xl">Joint coordinates</h3>
+                        </div>
+                        <button id="add-node-button" type="button" class="ui-btn ui-btn-secondary">
+                            Add Node
+                        </button>
+                    </div>
+
+                    <div class="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/50">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-white/10">
+                                <thead class="bg-white/[0.04]">
+                                    <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                        <th class="px-4 py-3">Node ID</th>
+                                        <th class="px-4 py-3">X Coordinate</th>
+                                        <th class="px-4 py-3">Y Coordinate</th>
+                                        <th class="px-4 py-3 text-right">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="nodes-table-body" class="divide-y divide-gray-200 dark:divide-white/10">
+                                    <tr>
+                                        <td colspan="4" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                            No nodes added yet.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="visualization" class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <div class="space-y-1 border-b border-white/10 pb-4">
+                        <p class="ui-label">Visualization</p>
+                        <h3 class="ui-heading text-xl">Truss model view</h3>
+                    </div>
+
+                    <div id="visualization-scene-shell" class="relative mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/70 transition-opacity duration-200">
+                        <div data-truss-visualization class="h-[440px] w-full"></div>
+                    </div>
+
+                    <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                        In Advanced Mode, click two nodes to create a member. Right-click a member in the model view to delete it.
+                    </p>
+                </div>
+
+                <div class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <button id="connectivity-summary-toggle" type="button" class="flex w-full items-center justify-between gap-4 text-left transition-all duration-200 hover:text-orange-600 dark:hover:text-[#ff8a3d]" aria-expanded="false">
+                        <div class="space-y-1">
+                            <p class="ui-label">Members</p>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <h3 class="ui-heading text-xl">Connectivity Summary</h3>
+                                <p id="connectivity-summary-count" class="text-sm font-medium text-gray-500 dark:text-gray-400">(0 members)</p>
+                            </div>
+                        </div>
+                        <span id="connectivity-summary-chevron" class="text-lg font-semibold text-gray-500 transition-transform duration-200 dark:text-gray-300">▶</span>
+                    </button>
+
+                    <div id="connectivity-summary-content" class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 ease-out">
+                        <div class="pt-5">
+                            <div class="overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/50">
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-white/10">
+                                        <thead id="members-table-head" class="bg-white/[0.04]"></thead>
+                                        <tbody id="members-table-body" class="divide-y divide-white/10">
+                                            <tr>
+                                                <td colspan="3" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                                    No member connectivity available yet.
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">
+                                In Advanced Mode, connectivity will come from the canvas workflow. Quick Builder Mode generates it automatically.
+                            </p>
+
+                            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                                <div class="rounded-[1.25rem] border border-white/10 bg-black/50 px-4 py-3">
+                                    <p class="ui-label">Nodes Count</p>
+                                    <p id="nodes-count" class="mt-2 text-lg font-semibold text-gray-900 dark:text-white">0</p>
+                                </div>
+                                <div class="rounded-[1.25rem] border border-white/10 bg-black/50 px-4 py-3">
+                                    <p class="ui-label">Members Count</p>
+                                    <p id="members-count" class="mt-2 text-lg font-semibold text-gray-900 dark:text-white">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="materials" class="ui-card ui-section">
+            <div class="space-y-3">
+                <p class="ui-label">Materials</p>
+                <h2 class="ui-heading text-2xl">Material properties</h2>
+                <div class="h-px bg-gray-200 dark:bg-white/10"></div>
+            </div>
+
+            <div id="materials-notification" data-controls-notification class="mt-6 hidden rounded-2xl border px-4 py-3 text-sm font-medium" role="alert" aria-live="polite"></div>
+
+            <div class="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
+                <div class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <div class="space-y-3">
+                        <p class="ui-label">Material Mode</p>
+                        <h3 class="ui-heading text-xl">Assignment strategy</h3>
+                    </div>
+
+                    <div class="mt-5 grid gap-4 sm:grid-cols-2">
+                        <label class="flex cursor-pointer items-start gap-3 rounded-[1.25rem] border border-white/10 bg-black/50 px-4 py-4 transition-all duration-300 hover:border-white/20 hover:shadow-[0_10px_28px_rgba(255,138,61,0.08)]">
+                            <input id="material-mode-global" class="mt-1 h-4 w-4 accent-orange-400" type="radio" name="material-mode" value="global" checked>
+                            <span class="space-y-1">
+                                <span class="block text-sm font-semibold text-gray-900 dark:text-white">Global</span>
+                                <span class="block text-sm text-gray-600 dark:text-gray-300">Use one Young's modulus and one area value across every member.</span>
+                            </span>
+                        </label>
+
+                        <label class="flex cursor-pointer items-start gap-3 rounded-[1.25rem] border border-white/10 bg-black/50 px-4 py-4 transition-all duration-300 hover:border-white/20 hover:shadow-[0_10px_28px_rgba(255,138,61,0.08)]">
+                            <input id="material-mode-per-member" class="mt-1 h-4 w-4 accent-orange-400" type="radio" name="material-mode" value="per_member">
+                            <span class="space-y-1">
+                                <span class="block text-sm font-semibold text-gray-900 dark:text-white">Per Member</span>
+                                <span class="block text-sm text-gray-600 dark:text-gray-300">Assign independent material values directly inside each member row.</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <p class="ui-label">Current Mode</p>
+                    <div class="mt-3 space-y-3">
+                        <h3 id="material-mode-title" class="ui-heading text-xl">Global material assignment</h3>
+                        <p id="material-mode-description" class="ui-body">A shared set of material properties will apply to all members in the current model.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="global-material-panel" class="mt-6 grid gap-6 md:grid-cols-2">
+                <div class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <label class="ui-label" for="global-material-e">Young's Modulus (E)</label>
+                    <input id="global-material-e" class="ui-input mt-3" type="number" step="any" inputmode="decimal" min="0" placeholder="Enter modulus value">
+                </div>
+                <div class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <label class="ui-label" for="global-material-a">Cross-sectional Area (A)</label>
+                    <input id="global-material-a" class="ui-input mt-3" type="number" step="any" inputmode="decimal" min="0" placeholder="Enter area value">
+                </div>
+            </div>
+
+            <div id="per-member-material-panel" class="mt-6 hidden rounded-[1.75rem] border border-white/10 bg-black/45 p-6">
+                <p class="ui-label">Per-Member Assignment</p>
+                <h3 class="ui-heading mt-2 text-xl">Material values are assigned per member</h3>
+                <p class="ui-body mt-3 max-w-3xl">
+                    Edit the member properties below. Existing values are preserved when you move between global and per-member modes.
+                </p>
+                <div class="mt-4 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/50">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-white/10">
+                            <thead class="bg-white/[0.04]">
+                                <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                    <th class="px-4 py-3">Member ID</th>
+                                    <th class="px-4 py-3">E</th>
+                                    <th class="px-4 py-3">A</th>
+                                </tr>
+                            </thead>
+                            <tbody id="per-member-material-table-body" class="divide-y divide-gray-200 dark:divide-white/10">
+                                <tr>
+                                    <td colspan="3" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                        No members available yet.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="supports" class="ui-card ui-section">
+            <div class="space-y-3">
+                <p class="ui-label">Supports</p>
+                <h2 class="ui-heading text-2xl">Boundary conditions</h2>
+                <div class="h-px bg-gray-200 dark:bg-white/10"></div>
+            </div>
+
+            <div id="supports-notification" data-controls-notification class="mt-6 hidden rounded-2xl border px-4 py-3 text-sm font-medium" role="alert" aria-live="polite"></div>
+
+                <div class="mt-6 rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <div class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div class="space-y-1">
+                        <p class="ui-label">Supports</p>
+                        <h3 class="ui-heading text-xl">Support assignments</h3>
+                    </div>
+                    <button id="add-support-button" type="button" class="ui-btn ui-btn-secondary">
+                        Add Support
+                    </button>
+                </div>
+
+                <div class="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/50">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-white/10">
+                            <thead class="bg-white/[0.04]">
+                                <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                    <th class="px-4 py-3">Support ID</th>
+                                    <th class="px-4 py-3">Node</th>
+                                    <th class="px-4 py-3">Type</th>
+                                    <th class="px-4 py-3 text-right">Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody id="supports-table-body" class="divide-y divide-gray-200 dark:divide-white/10">
+                                <tr>
+                                    <td colspan="4" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                        Add at least one node to begin assigning supports.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mt-4 rounded-[1.25rem] border border-white/10 bg-black/50 px-4 py-4">
+                    <p class="ui-body text-sm">Each node can have only one support assignment. Duplicate supports on the same node are prevented.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="loads" class="ui-card ui-section">
+            <div class="space-y-3">
+                <p class="ui-label">Loads</p>
+                <h2 class="ui-heading text-2xl">Load definition</h2>
+                <div class="h-px bg-gray-200 dark:bg-white/10"></div>
+            </div>
+
+            <div id="loads-notification" data-controls-notification class="mt-6 hidden rounded-2xl border px-4 py-3 text-sm font-medium" role="alert" aria-live="polite"></div>
+
+            <div class="mt-6 space-y-6">
+                <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-3 shadow-sm">
+                    <div class="grid gap-2 sm:grid-cols-2">
+                        <button id="load-mode-joint" type="button" data-load-mode="joint" class="ui-btn ui-btn-secondary justify-center bg-white/[0.08] shadow-none">
+                            Joint Loads
+                        </button>
+                        <button id="load-mode-member" type="button" data-load-mode="member" class="ui-btn ui-btn-secondary justify-center border-transparent bg-transparent shadow-none">
+                            Member Loads
+                        </button>
+                    </div>
+                </div>
+
+                <div id="joint-loads-panel" class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <div class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="space-y-1">
+                            <p class="ui-label">Joint Loads</p>
+                            <h3 class="ui-heading text-xl">Nodal loads</h3>
+                        </div>
+                        <button id="add-load-button" type="button" class="ui-btn ui-btn-secondary">
+                            Add Load
+                        </button>
+                    </div>
+
+                    <div class="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-black/50">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-white/10">
+                                <thead class="bg-white/[0.04]">
+                                    <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                                        <th class="px-4 py-3">Load ID</th>
+                                        <th class="px-4 py-3">Node</th>
+                                        <th class="px-4 py-3">Fx</th>
+                                        <th class="px-4 py-3">Fy</th>
+                                        <th class="px-4 py-3 text-right">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="loads-table-body" class="divide-y divide-gray-200 dark:divide-white/10">
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                            Add at least one node to begin assigning loads.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 rounded-[1.25rem] border border-white/10 bg-black/50 px-4 py-4">
+                        <p class="ui-body text-sm">Multiple loads can be assigned to the same node. Force components are stored independently for later solver use.</p>
+                    </div>
+                </div>
+
+                <div id="member-loads-panel" class="hidden rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                    <div class="space-y-1 border-b border-white/10 pb-4">
+                        <p class="ui-label">Member Loads</p>
+                        <h3 class="ui-heading text-xl">Apply a load along a member</h3>
+                    </div>
+
+                    <div class="mt-5 grid gap-6 md:grid-cols-2 xl:grid-cols-5">
+                        <div>
+                            <label class="ui-label" for="member-load-member">Member</label>
+                            <select id="member-load-member" class="ui-input mt-3"></select>
+                        </div>
+                        <div>
+                            <label class="ui-label" for="member-load-reference">Reference Node</label>
+                            <select id="member-load-reference" class="ui-input mt-3"></select>
+                        </div>
+                        <div>
+                            <label class="ui-label" for="member-load-distance">Distance From Reference Node (m)</label>
+                            <input id="member-load-distance" class="ui-input mt-3" type="number" step="any" min="0" inputmode="decimal" value="0">
+                            <p id="member-load-length-note" class="mt-2 text-xs text-gray-500 dark:text-gray-400"></p>
+                        </div>
+                        <div>
+                            <label class="ui-label" for="member-load-fx">Fx</label>
+                            <input id="member-load-fx" class="ui-input mt-3" type="number" step="any" inputmode="decimal" value="0">
+                        </div>
+                        <div>
+                            <label class="ui-label" for="member-load-fy">Fy</label>
+                            <input id="member-load-fy" class="ui-input mt-3" type="number" step="any" inputmode="decimal" value="0">
+                        </div>
+                    </div>
+
+                    <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
+                        <p class="ui-body text-sm">Loads applied on members are internally converted to joint loads for analysis.</p>
+                        <button id="convert-member-load-button" type="button" class="ui-btn ui-btn-secondary">
+                            Apply Load
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex flex-wrap items-center justify-end gap-3">
+            <input id="load-input-file" type="file" accept=".json,application/json" class="hidden">
+            <button id="save-input-button" type="button" class="ui-btn ui-btn-secondary">
+                Save Input
+            </button>
+            <button id="load-input-button" type="button" class="ui-btn ui-btn-secondary">
+                Load Input
+            </button>
+            <button id="solve-button" type="button" class="ui-btn ui-btn-primary min-w-40">
+                Solve
+            </button>
+        </div>
+
+        <section id="input-errors-panel" class="hidden rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-red-300">
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-red-200">Input Errors</h3>
+            <ul id="input-errors-list" class="mt-3 list-disc space-y-2 pl-5 text-sm"></ul>
+        </section>
+
+        {% include "components/results_panel.html" %}
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/api/analysisApi.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/ui/controls.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/ui/panels.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/ui/result-renderer.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/visualization/svgRenderer.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/visualization/analysisRenderer.js') }}" defer></script>
+{% endblock %}
