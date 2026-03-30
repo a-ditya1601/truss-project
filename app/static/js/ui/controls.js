@@ -125,6 +125,17 @@
       .replace(/\s+/g, "");
   }
 
+  function formatMemberId(start, end) {
+    const cleanStart = sanitizeNodeReference(start);
+    const cleanEnd = sanitizeNodeReference(end);
+
+    if (!cleanStart || !cleanEnd) {
+      return "";
+    }
+
+    return `${cleanStart}-${cleanEnd}`;
+  }
+
   function nodeExistsById(nodeId) {
     return state.nodes.some((node) => node.id === nodeId);
   }
@@ -334,7 +345,40 @@
     const preserveDependentState = Boolean(options.preserveDependentState);
 
     state.nodes = nextNodes.map((node) => ({ ...node }));
-    state.members = nextMembers.map((member) => ({ ...member }));
+    const memberIdMap = new Map();
+
+    state.members = nextMembers.map((member) => {
+      const start = sanitizeNodeReference(member.start);
+      const end = sanitizeNodeReference(member.end);
+      const formattedId = formatMemberId(start, end) || member.id;
+
+      if (member.id !== formattedId) {
+        memberIdMap.set(member.id, formattedId);
+      }
+
+      return {
+        ...member,
+        id: formattedId,
+        start,
+        end,
+      };
+    });
+
+    if (memberIdMap.size > 0) {
+      state.memberLoads = state.memberLoads.map((memberLoad) => ({
+        ...memberLoad,
+        memberId: memberIdMap.get(memberLoad.memberId) || memberLoad.memberId,
+      }));
+
+      if (state.memberLoadDraft.memberId) {
+        state.memberLoadDraft = {
+          ...state.memberLoadDraft,
+          memberId:
+            memberIdMap.get(state.memberLoadDraft.memberId) ||
+            state.memberLoadDraft.memberId,
+        };
+      }
+    }
     state.nextNodeNumber = getNextIdNumber(state.nodes, "N");
     state.nextMemberNumber = getNextIdNumber(state.members, "M");
 
@@ -357,7 +401,7 @@
     }
 
     memberList.push({
-      id: `M${memberList.length + 1}`,
+      id: formatMemberId(start, end),
       start,
       end,
       E: state.materialMode === "per_member" ? state.globalMaterial.E : null,
@@ -1469,7 +1513,7 @@
     }
 
     const newMember = {
-      id: `M${state.nextMemberNumber}`,
+      id: formatMemberId(start, end),
       start,
       end,
       E: state.materialMode === "per_member" ? state.globalMaterial.E : null,
@@ -1771,6 +1815,41 @@
       return;
     }
 
+    if (field === "start" || field === "end") {
+      const sanitizedValue = sanitizeNodeReference(nextValue);
+      let updatedMemberId = memberId;
+
+      state.members = state.members.map((member) => {
+        if (member.id !== memberId) {
+          return member;
+        }
+
+        const updatedMember = { ...member, [field]: sanitizedValue };
+        const formattedId = formatMemberId(updatedMember.start, updatedMember.end) || updatedMember.id;
+        updatedMemberId = formattedId;
+
+        return { ...updatedMember, id: formattedId };
+      });
+
+      if (updatedMemberId !== memberId) {
+        state.memberLoads = state.memberLoads.map((memberLoad) => ({
+          ...memberLoad,
+          memberId: memberLoad.memberId === memberId ? updatedMemberId : memberLoad.memberId,
+        }));
+
+        if (state.memberLoadDraft.memberId === memberId) {
+          state.memberLoadDraft = {
+            ...state.memberLoadDraft,
+            memberId: updatedMemberId,
+          };
+        }
+      }
+
+      clearMemberValidationState();
+      render({}, focusConfig);
+      return;
+    }
+
     state.members = state.members.map((member) =>
       member.id === memberId ? { ...member, [field]: sanitizeNodeReference(nextValue) } : member
     );
@@ -1895,11 +1974,18 @@
     const acceptedSupportNodes = new Set();
     const combinedLoadsByNode = new Map();
 
-    const members = snapshot.members.map((member) => ({
-      ...member,
-      start: sanitizeNodeReference(member.start),
-      end: sanitizeNodeReference(member.end),
-    }));
+    const members = snapshot.members.map((member) => {
+      const start = sanitizeNodeReference(member.start);
+      const end = sanitizeNodeReference(member.end);
+      const formattedId = formatMemberId(start, end) || member.id;
+
+      return {
+        ...member,
+        id: formattedId,
+        start,
+        end,
+      };
+    });
 
     const supports = snapshot.supports.filter((support) => {
       const validity = getSupportValidity(support, support.id);
@@ -2257,6 +2343,8 @@
       fx: Number(importedState.memberLoadDraft?.fx) || 0,
       fy: Number(importedState.memberLoadDraft?.fy) || 0,
     };
+
+    setGeometryData(state.nodes, state.members, { preserveDependentState: true });
 
     state.materialMode = importedState.materialMode;
     state.loadMode =
