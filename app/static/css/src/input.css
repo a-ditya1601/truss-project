@@ -109,6 +109,10 @@
     @apply flex items-center gap-3 rounded-r-xl border-l-2 border-transparent px-3 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-200 dark:hover:bg-white/5 dark:hover:text-white;
   }
 
+  .ui-floating-sidebar {
+    @apply lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto;
+  }
+
   .ui-sidebar-link-active {
     @apply border-[#ff8a3d] bg-orange-50 text-gray-900 shadow-sm dark:bg-white/[0.03] dark:text-white;
   }

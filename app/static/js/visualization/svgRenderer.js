@@ -28,15 +28,9 @@
   let currentView = null;
   let viewAnimationFrame = null;
 
-  const fitButton = document.createElement("button");
-  fitButton.type = "button";
-  fitButton.textContent = "Fit to View";
-  fitButton.className =
-    "absolute right-4 top-4 z-10 inline-flex items-center rounded-xl border border-gray-200 bg-white/95 px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-white/10 dark:bg-slate-900/90 dark:text-white";
   if (!sceneShell.style.position) {
     sceneShell.style.position = "relative";
   }
-  sceneShell.appendChild(fitButton);
 
   sceneShell.style.transition = "opacity 200ms ease";
 
@@ -1203,10 +1197,6 @@
       });
     });
   }
-
-  fitButton.addEventListener("click", () => {
-    fitCurrentView(true);
-  });
 
   window.addEventListener("truss-analysis:statechange", (event) => {
     renderTruss(event.detail, { skipFade: true });

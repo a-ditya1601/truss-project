@@ -19,7 +19,7 @@
       fy: 0,
     },
     loadMode: "joint",
-    inputMode: "advanced",
+    inputMode: "quick",
     quickBuilder: {
       spanLength: 24,
       panelCount: 6,
@@ -404,52 +404,98 @@
       nodes.map((node) => `${node.x.toFixed(6)}::${node.y.toFixed(6)}`)
     );
 
-    const hasMirroredNodes = nodes.every((node) => {
+    return nodes.every((node) => {
       const mirroredKey = `${(spanLength - node.x).toFixed(6)}::${node.y.toFixed(6)}`;
       return coordinateKeys.has(mirroredKey);
     });
-
-    if (!hasMirroredNodes) {
-      return false;
-    }
-
-    const mirroredMemberKeys = new Set(
-      members.map((member) => {
-        const startNode = nodeMap.get(member.start);
-        const endNode = nodeMap.get(member.end);
-        const mirroredStart = `${(spanLength - startNode.x).toFixed(6)}::${startNode.y.toFixed(6)}`;
-        const mirroredEnd = `${(spanLength - endNode.x).toFixed(6)}::${endNode.y.toFixed(6)}`;
-
-        return [mirroredStart, mirroredEnd].sort().join("::");
-      })
-    );
-
-    return members.every((member) => {
-      const startNode = nodeMap.get(member.start);
-      const endNode = nodeMap.get(member.end);
-      const memberKey = [
-        `${startNode.x.toFixed(6)}::${startNode.y.toFixed(6)}`,
-        `${endNode.x.toFixed(6)}::${endNode.y.toFixed(6)}`,
-      ]
-        .sort()
-        .join("::");
-
-      return mirroredMemberKeys.has(memberKey);
-    });
   }
 
-  function generateTruss(type, span, panels, heightInput) {
-    const safePanels = Math.max(2, Math.floor(Number(panels) || 2));
-    const safeSpan = Math.max(1, Number(span) || 1);
-    const panelLength = safeSpan / safePanels;
-    const idealHeight = panelLength;
-    const requestedHeight = Math.max(0.1, Number(heightInput) || idealHeight);
-    const safeHeight = Number(
-      Math.min(panelLength * 1.2, Math.max(panelLength * 0.8, requestedHeight)).toFixed(6)
-    );
+  function normalizeQuickBuilderSettings(type, span, panels, heightInput) {
     const normalizedType = ["pratt", "howe", "warren", "custom"].includes(type)
       ? type
       : "pratt";
+    const safePanels = Math.max(2, Math.floor(Number(panels) || 2));
+    const safeSpan = Math.max(1, Number(span) || 1);
+    const panelLength = safeSpan / safePanels;
+    const safeHeight = Number((Math.max(0.1, Number(heightInput) || panelLength)).toFixed(6));
+
+    return {
+      trussType: normalizedType,
+      spanLength: Number(safeSpan.toFixed(6)),
+      panelCount: safePanels,
+      height: safeHeight,
+      panelLength,
+    };
+  }
+
+  function getPanelDirectionSequence(type, panelCount) {
+    const directions = Array.from({ length: panelCount }, () => null);
+    const mid = Math.floor(panelCount / 2);
+
+    if (type === "pratt") {
+      for (let panelIndex = 0; panelIndex < panelCount; panelIndex += 1) {
+        directions[panelIndex] = panelIndex < mid ? "rising" : "falling";
+      }
+
+      return directions;
+    }
+
+    if (type === "howe") {
+      for (let panelIndex = 0; panelIndex < panelCount; panelIndex += 1) {
+        directions[panelIndex] = panelIndex < mid ? "falling" : "rising";
+      }
+
+      return directions;
+    }
+
+    if (type === "warren") {
+      if (panelCount % 2 === 0) {
+        for (let panelIndex = 0; panelIndex < panelCount; panelIndex += 1) {
+          directions[panelIndex] = panelIndex % 2 === 0 ? "rising" : "falling";
+        }
+
+        return directions;
+      }
+
+      let left = 0;
+      let right = panelCount - 1;
+      let pairIndex = 0;
+
+      while (left < right) {
+        const leftDirection = pairIndex % 2 === 0 ? "rising" : "falling";
+        const rightDirection = leftDirection === "rising" ? "falling" : "rising";
+
+        directions[left] = leftDirection;
+        directions[right] = rightDirection;
+
+        left += 1;
+        right -= 1;
+        pairIndex += 1;
+      }
+
+      if (left === right) {
+        directions[left] = pairIndex % 2 === 0 ? "rising" : "falling";
+      }
+
+      return directions;
+    }
+
+    return directions;
+  }
+
+  function generateTruss(type, span, panels, heightInput) {
+    const settings = normalizeQuickBuilderSettings(type, span, panels, heightInput);
+    const {
+      trussType: normalizedType,
+      spanLength: safeSpan,
+      panelCount: safePanels,
+      height: safeHeight,
+      panelLength,
+    } = settings;
+
+    const newNodes = [];
+    const newMembers = [];
+    const panelDiagonalCounts = Array.from({ length: safePanels }, () => 0);
 
     const bottomNodes = Array.from({ length: safePanels + 1 }, (_, index) => ({
       id: `N${index + 1}`,
@@ -464,17 +510,15 @@
     }));
 
     const topNodeByIndex = new Map(topNodes.map((node, index) => [index + 1, node]));
-    const members = [];
-    const panelDiagonalCounts = Array.from({ length: safePanels }, () => 0);
 
     const addDiagonal = (panelIndex, startId, endId) => {
       if (panelIndex < 0 || panelIndex >= safePanels) {
         return false;
       }
 
-      const memberCountBefore = members.length;
-      createMemberRecord(members, startId, endId);
-      if (members.length === memberCountBefore) {
+      const memberCountBefore = newMembers.length;
+      createMemberRecord(newMembers, startId, endId);
+      if (newMembers.length === memberCountBefore) {
         return false;
       }
 
@@ -509,15 +553,11 @@
     };
 
     const addPanelDiagonal = (panelIndex, preferredDirection) => {
-      const primary =
-        preferredDirection === "rising"
-          ? getRisingDiagonal(panelIndex)
-          : getFallingDiagonal(panelIndex);
-      const fallback =
-        preferredDirection === "rising"
-          ? getFallingDiagonal(panelIndex)
-          : getRisingDiagonal(panelIndex);
-      const selectedDiagonal = primary || fallback;
+      const rising = getRisingDiagonal(panelIndex);
+      const falling = getFallingDiagonal(panelIndex);
+      const primary = preferredDirection === "rising" ? rising : falling;
+      const edgeFallback = !rising || !falling ? rising || falling : null;
+      const selectedDiagonal = primary || edgeFallback;
 
       if (!selectedDiagonal) {
         return;
@@ -527,67 +567,49 @@
     };
 
     for (let index = 0; index < bottomNodes.length - 1; index += 1) {
-      createMemberRecord(members, bottomNodes[index].id, bottomNodes[index + 1].id);
+      createMemberRecord(newMembers, bottomNodes[index].id, bottomNodes[index + 1].id);
     }
 
     for (let index = 0; index < topNodes.length - 1; index += 1) {
-      createMemberRecord(members, topNodes[index].id, topNodes[index + 1].id);
+      createMemberRecord(newMembers, topNodes[index].id, topNodes[index + 1].id);
     }
 
     for (let topIndex = 1; topIndex < safePanels; topIndex += 1) {
       const topNode = topNodeByIndex.get(topIndex);
 
       if (topNode) {
-        createMemberRecord(members, bottomNodes[topIndex].id, topNode.id);
+        createMemberRecord(newMembers, bottomNodes[topIndex].id, topNode.id);
       }
     }
 
     if (normalizedType === "pratt" || normalizedType === "howe" || normalizedType === "warren") {
-      const mid = Math.floor(safePanels / 2);
+      const directionSequence = getPanelDirectionSequence(normalizedType, safePanels);
 
       for (let panelIndex = 0; panelIndex < safePanels; panelIndex += 1) {
-        if (normalizedType === "pratt") {
-          addPanelDiagonal(panelIndex, panelIndex < mid ? "rising" : "falling");
-        } else if (normalizedType === "howe") {
-          addPanelDiagonal(panelIndex, panelIndex < mid ? "falling" : "rising");
-        } else if (normalizedType === "warren") {
-          addPanelDiagonal(panelIndex, panelIndex % 2 === 0 ? "rising" : "falling");
-        }
+        addPanelDiagonal(panelIndex, directionSequence[panelIndex]);
       }
     }
 
-    const nodes = [...bottomNodes, ...topNodes];
+    newNodes.push(...bottomNodes, ...topNodes);
     const isValid = validateGeneratedTruss(
-      nodes,
-      members,
+      newNodes,
+      newMembers,
       panelDiagonalCounts,
       topNodes,
       safeSpan
     );
 
     if (!isValid) {
-      const fallbackGeometry = generateTruss("pratt", 24, 6, 4);
-
-      if (
-        normalizedType === "pratt" &&
-        safeSpan === 24 &&
-        safePanels === 6 &&
-        Number(safeHeight.toFixed(6)) === 4
-      ) {
-        return {
-          nodes,
-          members,
-          type: normalizedType,
-        };
-      }
-
-      return fallbackGeometry;
+      console.warn("Quick Builder produced a geometry that failed validation.", {
+        settings,
+      });
     }
 
     return {
-      nodes,
-      members,
+      nodes: newNodes,
+      members: newMembers,
       type: normalizedType,
+      settings,
     };
   }
 
@@ -598,6 +620,13 @@
       state.quickBuilder.panelCount,
       state.quickBuilder.height
     );
+
+    state.quickBuilder = {
+      spanLength: generatedGeometry.settings.spanLength,
+      panelCount: generatedGeometry.settings.panelCount,
+      height: generatedGeometry.settings.height,
+      trussType: generatedGeometry.settings.trussType,
+    };
 
     setGeometryData(generatedGeometry.nodes, generatedGeometry.members, {
       preserveDependentState: true,

@@ -19,11 +19,8 @@
     links.forEach((link) => {
       const isActive = link.getAttribute("href") === `#${sectionId}`;
 
-      link.classList.toggle("bg-white/5", isActive);
-      link.classList.toggle("text-white", isActive);
-      link.classList.toggle("border", isActive);
-      link.classList.toggle("border-[#ff8a3d]/20", isActive);
-      link.classList.toggle("shadow-[0_0_24px_rgba(255,138,61,0.12)]", isActive);
+      link.classList.toggle("ui-sidebar-link-active", isActive);
+      link.setAttribute("aria-current", isActive ? "page" : "false");
     });
   }
 

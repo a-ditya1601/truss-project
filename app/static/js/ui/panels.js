@@ -9,12 +9,28 @@
   const tabPanels = Array.from(panelRoot.querySelectorAll("[data-results-tab-panel]"));
   const resultsSection = document.querySelector("#results");
   const sidebarLinks = Array.from(document.querySelectorAll("[data-sidebar-link]"));
-  const observedSections = sidebarLinks
-    .map((link) => {
-      const targetId = link.getAttribute("href");
-      return targetId ? document.querySelector(targetId) : null;
+  const sidebarSectionOrder = [
+    "overview",
+    "geometry",
+    "visualization",
+    "materials",
+    "supports",
+    "loads",
+    "results",
+  ];
+  const observedSections = sidebarSectionOrder
+    .map((sectionId) => {
+      const element = document.getElementById(sectionId);
+
+      return element
+        ? {
+            id: sectionId,
+            element,
+          }
+        : null;
     })
     .filter(Boolean);
+  let scrollSyncFrame = null;
 
   function activateSidebarLink(sectionId) {
     sidebarLinks.forEach((link) => {
@@ -44,6 +60,53 @@
     });
   }
 
+  function getScrollActiveSectionId() {
+    if (observedSections.length === 0) {
+      return null;
+    }
+
+    const activationOffset = 120;
+    let activeSectionId = "";
+
+    observedSections.forEach((section) => {
+      const rect = section.element.getBoundingClientRect();
+
+      if (rect.top <= activationOffset && rect.bottom >= activationOffset) {
+        activeSectionId = section.id;
+      }
+    });
+
+    if (!activeSectionId) {
+      const nearBottom =
+        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+
+      if (nearBottom) {
+        activeSectionId = observedSections[observedSections.length - 1].id;
+      } else {
+        activeSectionId = observedSections[0].id;
+
+        observedSections.forEach((section) => {
+          const rect = section.element.getBoundingClientRect();
+
+          if (rect.top <= activationOffset) {
+            activeSectionId = section.id;
+          }
+        });
+      }
+    }
+
+    return activeSectionId;
+  }
+
+  function syncSidebarLinkFromScroll() {
+    const activeSectionId = getScrollActiveSectionId();
+
+    if (activeSectionId) {
+      console.log("Active Section:", activeSectionId);
+      activateSidebarLink(activeSectionId);
+    }
+  }
+
   tabButtons.forEach((button) => {
     button.addEventListener("click", () => {
       activateTab(button.dataset.resultsTab);
@@ -51,25 +114,20 @@
   });
 
   if (sidebarLinks.length > 0 && observedSections.length > 0) {
-    const sectionObserver = new IntersectionObserver(
-      (entries) => {
-        const visibleEntries = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((first, second) => second.intersectionRatio - first.intersectionRatio);
-
-        if (visibleEntries.length > 0) {
-          activateSidebarLink(visibleEntries[0].target.id);
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (scrollSyncFrame) {
+          return;
         }
-      },
-      {
-        rootMargin: "-15% 0px -60% 0px",
-        threshold: [0.15, 0.35, 0.6],
-      }
-    );
 
-    observedSections.forEach((section) => {
-      sectionObserver.observe(section);
-    });
+        scrollSyncFrame = window.requestAnimationFrame(() => {
+          scrollSyncFrame = null;
+          syncSidebarLinkFromScroll();
+        });
+      },
+      { passive: true }
+    );
   }
 
   window.addEventListener("truss-results:visible", () => {
@@ -84,7 +142,7 @@
   });
 
   if (sidebarLinks.length > 0) {
-    activateSidebarLink("overview");
+    syncSidebarLinkFromScroll();
   }
   activateTab("results");
 })();

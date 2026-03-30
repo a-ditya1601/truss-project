@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="grid gap-8 lg:grid-cols-[260px_minmax(0,1fr)]" data-analysis-controls>
-    <aside class="lg:sticky lg:top-8 lg:h-[calc(100vh-4rem)] lg:overflow-y-auto">
+    <aside class="ui-floating-sidebar">
         <div class="ui-card h-full bg-black/55 p-4">
             <div class="space-y-2 border-b border-white/10 px-3 pb-4">
                 <p class="ui-label">Workspace</p>
@@ -31,6 +31,16 @@
                         </svg>
                     </span>
                     <span>Geometry</span>
+                </a>
+
+                <a href="#visualization" data-sidebar-link class="ui-sidebar-link">
+                    <span class="ui-sidebar-icon dark:text-[#ff8a3d]">
+                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="4" y="5" width="16" height="14" rx="2"/>
+                            <path d="M8 15L11 12L13.5 14.5L17 10"/>
+                        </svg>
+                    </span>
+                    <span>Visualization</span>
                 </a>
 
                 <a href="#materials" data-sidebar-link class="ui-sidebar-link">
@@ -63,16 +73,6 @@
                         </svg>
                     </span>
                     <span>Loads</span>
-                </a>
-
-                <a href="#visualization" data-sidebar-link class="ui-sidebar-link">
-                    <span class="ui-sidebar-icon dark:text-[#ff8a3d]">
-                        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect x="4" y="5" width="16" height="14" rx="2"/>
-                            <path d="M8 15L11 12L13.5 14.5L17 10"/>
-                        </svg>
-                    </span>
-                    <span>Visualization</span>
                 </a>
 
                 <a href="#results" data-sidebar-link class="ui-sidebar-link">
@@ -125,16 +125,16 @@
             <div class="mt-6 space-y-6">
                 <div class="rounded-[1.5rem] border border-white/10 bg-black/45 p-3 shadow-sm">
                     <div class="grid gap-2 sm:grid-cols-2">
-                        <button id="geometry-mode-quick" type="button" data-geometry-mode="quick" class="ui-btn ui-btn-secondary justify-center border-transparent bg-transparent shadow-none">
+                        <button id="geometry-mode-quick" type="button" data-geometry-mode="quick" class="ui-btn ui-btn-secondary justify-center border-transparent bg-white/[0.08] shadow-none">
                             Quick Builder Mode
                         </button>
-                        <button id="geometry-mode-advanced" type="button" data-geometry-mode="advanced" class="ui-btn ui-btn-secondary justify-center border-transparent bg-white/[0.08] shadow-none">
+                        <button id="geometry-mode-advanced" type="button" data-geometry-mode="advanced" class="ui-btn ui-btn-secondary justify-center border-transparent bg-transparent shadow-none">
                             Advanced Mode
                         </button>
                     </div>
                 </div>
 
-                <div id="quick-builder-panel" class="hidden rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                <div id="quick-builder-panel" class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
                     <div class="space-y-1 border-b border-white/10 pb-4">
                         <p class="ui-label">Quick Builder</p>
                         <h3 class="ui-heading text-xl">Generate a base truss automatically</h3>
@@ -165,7 +165,7 @@
                     </div>
                 </div>
 
-                <div id="advanced-geometry-panel" class="rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
+                <div id="advanced-geometry-panel" class="hidden rounded-[1.75rem] border border-white/10 bg-black/45 p-6 shadow-sm">
                     <div class="flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
                         <div class="space-y-1">
                             <p class="ui-label">Nodes</p>
