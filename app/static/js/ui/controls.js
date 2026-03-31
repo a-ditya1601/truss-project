@@ -475,6 +475,10 @@
     isStabilityWarningActive = false;
   }
 
+  function notifyResultsStale() {
+    window.dispatchEvent(new CustomEvent("truss-analysis:inputchanged"));
+  }
+
   function clearMemberValidationState() {
     memberValidationErrors = [];
     invalidMemberRowIds = new Set();
@@ -2655,6 +2659,7 @@
 
         restoreStateFromImport(parsedData);
         clearStabilityWarning();
+        notifyResultsStale();
         render();
         showNotification("Input loaded successfully.", "info");
       } catch (error) {
@@ -2735,6 +2740,8 @@
       render();
       return;
     }
+
+    clearStabilityWarning();
     const validationError = validateBeforeSolve(solverInput);
 
     if (validationError) {
@@ -2832,24 +2839,28 @@
 
     if (addNodeTrigger) {
       clearStabilityWarning();
+      notifyResultsStale();
       addNode();
       return;
     }
 
     if (addSupportTrigger) {
       clearStabilityWarning();
+      notifyResultsStale();
       addSupport();
       return;
     }
 
     if (addLoadTrigger) {
       clearStabilityWarning();
+      notifyResultsStale();
       addLoad();
       return;
     }
 
     if (convertMemberLoadTrigger) {
       clearStabilityWarning();
+      notifyResultsStale();
       convertMemberLoad();
       return;
     }
@@ -2886,18 +2897,21 @@
 
     if (deleteNodeTrigger) {
       clearStabilityWarning();
+      notifyResultsStale();
       deleteNode(deleteNodeTrigger.dataset.deleteNode, deleteNodeTrigger.closest("tr"));
       return;
     }
 
     if (deleteSupportTrigger) {
       clearStabilityWarning();
+      notifyResultsStale();
       deleteSupport(deleteSupportTrigger.dataset.deleteSupport, deleteSupportTrigger.closest("tr"));
       return;
     }
 
     if (deleteLoadTrigger) {
       clearStabilityWarning();
+      notifyResultsStale();
       deleteLoad(deleteLoadTrigger.dataset.deleteLoad, deleteLoadTrigger.closest("tr"));
     }
   }
@@ -2918,6 +2932,7 @@
 
     if (nodeInput || memberMaterialField || supportField || loadField || materialModeInput || geometryModeInput || loadModeInput || globalMaterialInput || quickBuilderInput || memberLoadInput) {
       clearStabilityWarning();
+      notifyResultsStale();
     }
 
     if (nodeInput) {
@@ -2996,6 +3011,7 @@
 
     if (supportField || loadField || quickBuilderInput || memberLoadInput) {
       clearStabilityWarning();
+      notifyResultsStale();
     }
 
     if (supportField) {
@@ -3068,4 +3084,10 @@
 
   applyQuickBuilderGeometry();
   render();
+
+  window.addEventListener("truss-analysis:solved", (event) => {
+    if (String(event?.detail?.truss_type || "").toLowerCase() !== "unstable") {
+      clearStabilityWarning();
+    }
+  });
 })();

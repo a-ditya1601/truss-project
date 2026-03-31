@@ -205,7 +205,7 @@
     const baseSize = Math.min(bounds.width, bounds.height);
     const arrowLength = Math.max(12, Math.min(28, baseSize * activeView.scale * 0.08));
     const arrowWidth = arrowLength * 0.35;
-    const supportSize = arrowLength * 0.9;
+    const supportSize = arrowLength * 1.35;
     const loadStrokeWidth = Math.max(2, Math.min(4, arrowWidth * 0.18));
 
     return {
@@ -656,12 +656,9 @@
     const loadsGroup = createSvgElement("g", { "aria-hidden": "true" });
     const memberLoadsGroup = createSvgElement("g", { "aria-hidden": "true" });
     const nodesGroup = createSvgElement("g", { "aria-hidden": "true" });
-    const showSupports = state.inputMode !== "quick";
 
     drawMembers(membersGroup, state.members || [], nodeMap, mapPoint, colors, state);
-    if (showSupports) {
-      drawSupports(supportsGroup, state.supports || [], nodeMap, mapPoint, colors, activeView);
-    }
+    drawSupports(supportsGroup, state.supports || [], nodeMap, mapPoint, colors, activeView);
     drawLoads(loadsGroup, state.loads || [], nodeMap, mapPoint, colors, activeView);
     drawMemberLoads(memberLoadsGroup, state.memberLoads || [], memberMap, nodeMap, mapPoint, colors, activeView);
     drawNodes(nodesGroup, state.nodes, mapPoint, colors, state);

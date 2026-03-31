@@ -526,12 +526,23 @@
     elements.status.classList.add("hidden");
   }
 
+  function collapseResults() {
+    setResultsVisible(false);
+    panelRoot.classList.add("translate-y-3", "opacity-0");
+    panelRoot.classList.remove("translate-y-0", "opacity-100", "is-visible");
+    elements.status.classList.add("hidden");
+  }
+
   window.addEventListener("truss-analysis:solved", (event) => {
     renderSolvedResult(event.detail);
   });
 
   window.addEventListener("truss-analysis:solveerror", (event) => {
     renderErrorState(event.detail?.error || "Unable to complete the analysis.");
+  });
+
+  window.addEventListener("truss-analysis:inputchanged", () => {
+    collapseResults();
   });
 
   setResultsVisible(false);
