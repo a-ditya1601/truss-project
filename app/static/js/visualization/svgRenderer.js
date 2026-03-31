@@ -837,6 +837,7 @@
       const point = mapPoint(node);
       const triangleTopY = point.y + supportSize * 0.28;
       const triangleBaseY = point.y + supportSize;
+      const rollerDirection = String(support.direction || "y").toLowerCase();
 
       if (support.type === "pinned") {
         group.appendChild(
@@ -851,35 +852,69 @@
       }
 
       if (support.type === "roller") {
-        group.appendChild(
-          createSvgElement("path", {
-            d: `M ${point.x - supportSize * 0.55} ${triangleBaseY - supportSize * 0.22} L ${point.x} ${triangleTopY} L ${point.x + supportSize * 0.55} ${triangleBaseY - supportSize * 0.22} Z`,
-            fill: colors.supportFill,
-            stroke: colors.supportStroke,
-            "stroke-width": String(Math.max(1.5, metrics.loadStrokeWidth * 0.8)),
-            opacity: "0.95",
-          })
-        );
-        group.appendChild(
-          createSvgElement("circle", {
-            cx: point.x - supportSize * 0.22,
-            cy: triangleBaseY + supportSize * 0.18,
-            r: String(wheelRadius),
-            fill: colors.supportFill,
-            stroke: colors.supportStroke,
-            "stroke-width": String(Math.max(1.2, metrics.loadStrokeWidth * 0.7)),
-          })
-        );
-        group.appendChild(
-          createSvgElement("circle", {
-            cx: point.x + supportSize * 0.22,
-            cy: triangleBaseY + supportSize * 0.18,
-            r: String(wheelRadius),
-            fill: colors.supportFill,
-            stroke: colors.supportStroke,
-            "stroke-width": String(Math.max(1.2, metrics.loadStrokeWidth * 0.7)),
-          })
-        );
+        if (rollerDirection === "x") {
+          const triangleTipX = point.x - supportSize * 0.28;
+          const triangleBaseX = point.x - supportSize;
+          group.appendChild(
+            createSvgElement("path", {
+              d: `M ${triangleBaseX} ${point.y - supportSize * 0.55} L ${triangleTipX} ${point.y} L ${triangleBaseX} ${point.y + supportSize * 0.55} Z`,
+              fill: colors.supportFill,
+              stroke: colors.supportStroke,
+              "stroke-width": String(Math.max(1.5, metrics.loadStrokeWidth * 0.8)),
+              opacity: "0.95",
+            })
+          );
+          group.appendChild(
+            createSvgElement("circle", {
+              cx: triangleBaseX - supportSize * 0.18,
+              cy: point.y - supportSize * 0.22,
+              r: String(wheelRadius),
+              fill: colors.supportFill,
+              stroke: colors.supportStroke,
+              "stroke-width": String(Math.max(1.2, metrics.loadStrokeWidth * 0.7)),
+            })
+          );
+          group.appendChild(
+            createSvgElement("circle", {
+              cx: triangleBaseX - supportSize * 0.18,
+              cy: point.y + supportSize * 0.22,
+              r: String(wheelRadius),
+              fill: colors.supportFill,
+              stroke: colors.supportStroke,
+              "stroke-width": String(Math.max(1.2, metrics.loadStrokeWidth * 0.7)),
+            })
+          );
+        } else {
+          group.appendChild(
+            createSvgElement("path", {
+              d: `M ${point.x - supportSize * 0.55} ${triangleBaseY - supportSize * 0.22} L ${point.x} ${triangleTopY} L ${point.x + supportSize * 0.55} ${triangleBaseY - supportSize * 0.22} Z`,
+              fill: colors.supportFill,
+              stroke: colors.supportStroke,
+              "stroke-width": String(Math.max(1.5, metrics.loadStrokeWidth * 0.8)),
+              opacity: "0.95",
+            })
+          );
+          group.appendChild(
+            createSvgElement("circle", {
+              cx: point.x - supportSize * 0.22,
+              cy: triangleBaseY + supportSize * 0.18,
+              r: String(wheelRadius),
+              fill: colors.supportFill,
+              stroke: colors.supportStroke,
+              "stroke-width": String(Math.max(1.2, metrics.loadStrokeWidth * 0.7)),
+            })
+          );
+          group.appendChild(
+            createSvgElement("circle", {
+              cx: point.x + supportSize * 0.22,
+              cy: triangleBaseY + supportSize * 0.18,
+              r: String(wheelRadius),
+              fill: colors.supportFill,
+              stroke: colors.supportStroke,
+              "stroke-width": String(Math.max(1.2, metrics.loadStrokeWidth * 0.7)),
+            })
+          );
+        }
       }
 
       if (support.type === "fixed") {

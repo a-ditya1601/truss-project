@@ -17,6 +17,10 @@
     explanationContent: panelRoot.querySelector("#results-explanation-content"),
   };
 
+  if (elements.memberTableBody) {
+    elements.memberTablePanel = elements.memberTableBody.closest(".overflow-hidden");
+  }
+
   function setResultsVisible(isVisible) {
     panelRoot.classList.toggle("hidden", !isVisible);
     panelRoot.setAttribute("aria-hidden", String(!isVisible));
@@ -113,6 +117,10 @@
   }
 
   function renderMemberTable(memberForces = []) {
+    if (elements.memberTablePanel) {
+      elements.memberTablePanel.classList.remove("hidden");
+    }
+
     if (!Array.isArray(memberForces) || memberForces.length === 0) {
       elements.memberTableBody.innerHTML = `
         <tr>
@@ -151,6 +159,55 @@
         `;
       })
       .join("");
+  }
+
+  function getSupportStats(model) {
+    if (!model) {
+      return { rollerCount: 0, freeNodes: [] };
+    }
+
+    const supportedNodes = new Set();
+    let rollerCount = 0;
+
+    (model.supports || []).forEach((support) => {
+      supportedNodes.add(support.node);
+      if (support.type === "roller") {
+        rollerCount += 1;
+      }
+    });
+
+    const freeNodes = (model.nodes || [])
+      .map((node) => node.id)
+      .filter((nodeId) => !supportedNodes.has(nodeId));
+
+    return { rollerCount, freeNodes };
+  }
+
+  function buildUnstableMessage(model, result) {
+    const parameters = result?.parameters || {};
+    const memberCount = Number(parameters.m ?? 0);
+    const jointCount = Number(parameters.j ?? 0);
+    const reactionCount = Number(parameters.r ?? 0);
+    const expressionValue = memberCount + reactionCount;
+    const stabilityTarget = jointCount * 2;
+    const missing = Math.max(0, stabilityTarget - expressionValue);
+    const { rollerCount, freeNodes } = getSupportStats(model);
+    const suggestions = [];
+
+    if (rollerCount > 0) {
+      suggestions.push("Change a roller to pinned to add 1 reaction.");
+    }
+
+    if (freeNodes.length > 0 && missing >= 2) {
+      suggestions.push("Add a pinned support at an unsupported node to add 2 reactions.");
+    }
+
+    if (missing > 0) {
+      suggestions.push(`Add ${missing} member${missing > 1 ? "s" : ""} to increase stability.`);
+    }
+
+    const base = `Structure is unstable (m + r = ${expressionValue} < 2j = ${stabilityTarget}). Missing ${missing} constraint${missing === 1 ? "" : "s"}.`;
+    return suggestions.length > 0 ? `${base} ${suggestions.join(" ")}` : base;
   }
 
   function buildNodeLookup(nodes) {
@@ -433,6 +490,24 @@
 
   function renderSolvedResult(result) {
     triggerResultsEntrance();
+    if (String(result.truss_type || "").toLowerCase() === "unstable") {
+      const warningMessage = buildUnstableMessage(getCurrentModel(), result);
+      renderStatus(warningMessage, "error");
+      renderTrussBadge(result.truss_type);
+      renderParameters(result.parameters);
+
+      if (elements.memberTablePanel) {
+        elements.memberTablePanel.classList.add("hidden");
+      }
+
+      elements.explanationContent.innerHTML = generateMethodOfJointsExplanation(
+        getCurrentModel(),
+        result
+      );
+      window.dispatchEvent(new CustomEvent("truss-results:visible"));
+      return;
+    }
+
     renderStatus("Analysis completed successfully. Review the force summary and explanation tabs below.", "success");
     renderTrussBadge(result.truss_type);
     renderParameters(result.parameters);

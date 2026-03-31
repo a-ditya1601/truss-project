@@ -69,6 +69,9 @@
     membersCount: controlsRoot.querySelector("#members-count"),
     inputErrorsPanel: controlsRoot.querySelector("#input-errors-panel"),
     inputErrorsList: controlsRoot.querySelector("#input-errors-list"),
+    stabilityNotification: controlsRoot.querySelector("#stability-notification"),
+    centerToast: controlsRoot.querySelector("#center-toast"),
+    centerToastMessage: controlsRoot.querySelector("#center-toast-message"),
     geometryModeButtons: controlsRoot.querySelectorAll("[data-geometry-mode]"),
     quickBuilderPanel: controlsRoot.querySelector("#quick-builder-panel"),
     advancedGeometryPanel: controlsRoot.querySelector("#advanced-geometry-panel"),
@@ -88,10 +91,12 @@
   };
 
   let notificationTimerId = null;
+  let centerToastTimerId = null;
   let isSolving = false;
   let memberValidationErrors = [];
   let invalidMemberRowIds = new Set();
   let isConnectivityExpanded = false;
+  let isStabilityWarningActive = false;
 
   function createButtonLabel(label, includeSpinner = false) {
     if (!includeSpinner) {
@@ -246,14 +251,107 @@
     const nodeExists = nodeExistsById(nodeId);
     const validType = ["pinned", "roller", "fixed"].includes(support.type);
     const duplicate = nodeExists && supportExists(nodeId, excludeId);
+    const normalizedDirection =
+      support.type === "roller"
+        ? String(support.direction ?? "y").trim().toLowerCase()
+        : null;
+    const validDirection =
+      support.type !== "roller" || ["x", "y"].includes(normalizedDirection);
 
     return {
       nodeId,
       nodeExists,
       validType,
       duplicate,
-      isSolverEligible: nodeExists && validType && !duplicate,
+      direction: normalizedDirection,
+      validDirection,
+      isSolverEligible: nodeExists && validType && validDirection && !duplicate,
     };
+  }
+
+  function getReactionCount(supports) {
+    return supports.reduce((count, support) => {
+      if (support.type === "roller") {
+        return count + 1;
+      }
+
+      if (support.type === "pinned" || support.type === "fixed") {
+        return count + 2;
+      }
+
+      return count;
+    }, 0);
+  }
+
+  function getSupportStats(model) {
+    const supportedNodes = new Set();
+    let rollerCount = 0;
+    let pinnedFixedCount = 0;
+
+    model.supports.forEach((support) => {
+      supportedNodes.add(support.node);
+
+      if (support.type === "roller") {
+        rollerCount += 1;
+      } else if (support.type === "pinned" || support.type === "fixed") {
+        pinnedFixedCount += 1;
+      }
+    });
+
+    const freeNodes = model.nodes
+      .map((node) => node.id)
+      .filter((nodeId) => !supportedNodes.has(nodeId));
+
+    return {
+      rollerCount,
+      pinnedFixedCount,
+      freeNodes,
+    };
+  }
+
+  function getStabilitySummary(model) {
+    const jointCount = model.nodes.length;
+    const memberCount = model.members.length;
+    const reactionCount = getReactionCount(model.supports);
+    const expressionValue = memberCount + reactionCount;
+    const stabilityTarget = jointCount * 2;
+    const missing = Math.max(0, stabilityTarget - expressionValue);
+
+    return {
+      memberCount,
+      jointCount,
+      reactionCount,
+      expressionValue,
+      stabilityTarget,
+      missing,
+      isUnstable: expressionValue < stabilityTarget,
+    };
+  }
+
+  function buildUnstableRecommendation(model, stability) {
+    const { rollerCount, freeNodes } = getSupportStats(model);
+    const missing = stability.missing;
+    const suggestions = [];
+
+    if (rollerCount > 0) {
+      suggestions.push("Change a roller to pinned to add 1 reaction.");
+    }
+
+    if (freeNodes.length > 0 && missing >= 2) {
+      suggestions.push("Add a pinned support at an unsupported node to add 2 reactions.");
+    }
+
+    if (missing > 0) {
+      suggestions.push(`Add ${missing} member${missing > 1 ? "s" : ""} to increase stability.`);
+    }
+
+    return suggestions;
+  }
+
+  function buildUnstableMessage(model, stability) {
+    const suggestions = buildUnstableRecommendation(model, stability);
+    const base = `Structure is unstable (m + r = ${stability.expressionValue} < 2j = ${stability.stabilityTarget}). Missing ${stability.missing} constraint${stability.missing === 1 ? "" : "s"}.`;
+    return suggestions.length > 0 ? `${base} ${suggestions.join(" ")}` : base;
   }
 
   function getLoadValidity(load) {
@@ -324,6 +422,57 @@
         target.classList.add("hidden");
       });
     }, 3200);
+
+    if (type === "error") {
+      showCenteredToast(message);
+    }
+  }
+
+  function showCenteredToast(message) {
+    if (!elements.centerToast || !elements.centerToastMessage) {
+      return;
+    }
+
+    window.clearTimeout(centerToastTimerId);
+    elements.centerToastMessage.textContent = message;
+    elements.centerToast.classList.remove("hidden");
+
+    window.requestAnimationFrame(() => {
+      elements.centerToast.classList.add("opacity-100", "scale-100", "translate-y-0");
+      elements.centerToast.classList.remove("opacity-0", "scale-95", "translate-y-2");
+    });
+
+    centerToastTimerId = window.setTimeout(() => {
+      elements.centerToast.classList.add("opacity-0", "scale-95", "translate-y-2");
+      elements.centerToast.classList.remove("opacity-100", "scale-100", "translate-y-0");
+      window.setTimeout(() => {
+        elements.centerToast.classList.add("hidden");
+      }, 260);
+    }, 3000);
+  }
+
+  function showStabilityWarning(message) {
+    if (!elements.stabilityNotification) {
+      return;
+    }
+
+    const variant =
+      "border-red-200 bg-red-50 text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200";
+
+    elements.stabilityNotification.className = `rounded-2xl border px-4 py-3 text-sm font-medium ${variant}`;
+    elements.stabilityNotification.textContent = message;
+    elements.stabilityNotification.classList.remove("hidden");
+    isStabilityWarningActive = true;
+  }
+
+  function clearStabilityWarning() {
+    if (!isStabilityWarningActive || !elements.stabilityNotification) {
+      return;
+    }
+
+    elements.stabilityNotification.classList.add("hidden");
+    elements.stabilityNotification.textContent = "";
+    isStabilityWarningActive = false;
   }
 
   function clearMemberValidationState() {
@@ -787,6 +936,20 @@
       .join("");
   }
 
+  function buildSupportDirectionOptions(selectedValue) {
+    const directionOptions = [
+      { value: "y", label: "Vertical (Y)" },
+      { value: "x", label: "Horizontal (X)" },
+    ];
+
+    return directionOptions
+      .map((direction) => {
+        const isSelected = direction.value === selectedValue ? "selected" : "";
+        return `<option value="${direction.value}" ${isSelected}>${direction.label}</option>`;
+      })
+      .join("");
+  }
+
   function updateCounts() {
     elements.nodesCount.textContent = String(state.nodes.length);
     elements.membersCount.textContent = String(state.members.length);
@@ -1143,6 +1306,7 @@
       .map((support) => {
         const isNewRow = support.id === highlightId;
         const validity = getSupportValidity(support, support.id);
+        const showDirection = support.type === "roller";
 
         return `
           <tr data-support-row="${support.id}" data-new-row="${isNewRow}" class="transition-all duration-200 ${isNewRow ? "translate-y-2 opacity-0" : "translate-y-0 opacity-100"}">
@@ -1169,6 +1333,24 @@
               >
                 ${buildSupportTypeOptions(support.type)}
               </select>
+              ${
+                showDirection
+                  ? `
+                <div class="mt-3">
+                  <label class="block text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">Direction</label>
+                  <select
+                    class="ui-input mt-2 text-sm"
+                    data-support-id="${support.id}"
+                    data-support-field="direction"
+                    aria-label="${support.id} roller direction"
+                  >
+                    ${buildSupportDirectionOptions(validity.direction || "y")}
+                  </select>
+                </div>
+              `
+                  : ""
+              }
+              ${!validity.validDirection ? '<p class="mt-2 text-xs font-medium text-red-500">Invalid roller direction</p>' : ""}
             </td>
             <td class="px-4 py-4 text-right">
               <button
@@ -1566,6 +1748,7 @@
       id: `S${state.nextSupportNumber}`,
       node: availableNode.id,
       type: "pinned",
+      direction: "y",
     };
 
     state.nextSupportNumber += 1;
@@ -1878,8 +2061,45 @@
       return;
     }
 
-    if (field === "type" && !["pinned", "roller", "fixed"].includes(nextValue)) {
-      showNotification("Choose a valid support type.");
+    if (field === "type") {
+      if (!["pinned", "roller", "fixed"].includes(nextValue)) {
+        showNotification("Choose a valid support type.");
+        render({}, focusConfig);
+        return;
+      }
+
+      state.supports = state.supports.map((support) => {
+        if (support.id !== supportId) {
+          return support;
+        }
+
+        const nextSupport = { ...support, type: nextValue };
+
+        if (nextValue === "roller") {
+          nextSupport.direction = support.direction === "x" ? "x" : "y";
+        }
+
+        return nextSupport;
+      });
+
+      render({}, focusConfig);
+      return;
+    }
+
+    if (field === "direction") {
+      const normalizedDirection = String(nextValue || "")
+        .trim()
+        .toLowerCase();
+
+      if (!["x", "y"].includes(normalizedDirection)) {
+        showNotification("Choose a valid roller direction.");
+        render({}, focusConfig);
+        return;
+      }
+
+      state.supports = state.supports.map((support) =>
+        support.id === supportId ? { ...support, direction: normalizedDirection } : support
+      );
       render({}, focusConfig);
       return;
     }
@@ -1987,17 +2207,26 @@
       };
     });
 
-    const supports = snapshot.supports.filter((support) => {
-      const validity = getSupportValidity(support, support.id);
+    const supports = snapshot.supports
+      .map((support) => ({ ...support }))
+      .filter((support) => {
+        const validity = getSupportValidity(support, support.id);
 
-      if (!validity.isSolverEligible || acceptedSupportNodes.has(validity.nodeId)) {
-        return false;
-      }
+        if (!validity.isSolverEligible || acceptedSupportNodes.has(validity.nodeId)) {
+          return false;
+        }
 
-      acceptedSupportNodes.add(validity.nodeId);
-      support.node = validity.nodeId;
-      return true;
-    });
+        acceptedSupportNodes.add(validity.nodeId);
+        support.node = validity.nodeId;
+
+        if (support.type === "roller") {
+          support.direction = validity.direction || "y";
+        } else {
+          delete support.direction;
+        }
+
+        return true;
+      });
 
     snapshot.loads.forEach((load) => {
       const validity = getLoadValidity(load);
@@ -2211,6 +2440,14 @@
         return `Support ${support.id} has an invalid type.`;
       }
 
+      if (
+        support.type === "roller" &&
+        support.direction !== undefined &&
+        !["x", "y"].includes(String(support.direction).trim().toLowerCase())
+      ) {
+        return `Support ${support.id} has an invalid roller direction.`;
+      }
+
       if (supportedNodes.has(support.node)) {
         return `Node ${support.node} has more than one support assignment.`;
       }
@@ -2320,6 +2557,10 @@
       id: support.id,
       node: support.node,
       type: support.type,
+      direction:
+        support.type === "roller"
+          ? String(support.direction ?? "y").trim().toLowerCase()
+          : support.direction ?? "y",
     }));
 
     state.loads = importedState.loads.map((load) => ({
@@ -2413,6 +2654,7 @@
         }
 
         restoreStateFromImport(parsedData);
+        clearStabilityWarning();
         render();
         showNotification("Input loaded successfully.", "info");
       } catch (error) {
@@ -2483,6 +2725,16 @@
     }
 
     const solverInput = buildSolverInput();
+    const stability = getStabilitySummary(solverInput);
+
+    if (stability.isUnstable) {
+      const warningMessage = buildUnstableMessage(solverInput, stability);
+      showStabilityWarning(warningMessage);
+      showNotification(warningMessage, "error");
+      showCenteredToast("Unstable truss — not solvable");
+      render();
+      return;
+    }
     const validationError = validateBeforeSolve(solverInput);
 
     if (validationError) {
@@ -2579,21 +2831,25 @@
     const deleteLoadTrigger = event.target.closest("[data-delete-load]");
 
     if (addNodeTrigger) {
+      clearStabilityWarning();
       addNode();
       return;
     }
 
     if (addSupportTrigger) {
+      clearStabilityWarning();
       addSupport();
       return;
     }
 
     if (addLoadTrigger) {
+      clearStabilityWarning();
       addLoad();
       return;
     }
 
     if (convertMemberLoadTrigger) {
+      clearStabilityWarning();
       convertMemberLoad();
       return;
     }
@@ -2629,16 +2885,19 @@
     }
 
     if (deleteNodeTrigger) {
+      clearStabilityWarning();
       deleteNode(deleteNodeTrigger.dataset.deleteNode, deleteNodeTrigger.closest("tr"));
       return;
     }
 
     if (deleteSupportTrigger) {
+      clearStabilityWarning();
       deleteSupport(deleteSupportTrigger.dataset.deleteSupport, deleteSupportTrigger.closest("tr"));
       return;
     }
 
     if (deleteLoadTrigger) {
+      clearStabilityWarning();
       deleteLoad(deleteLoadTrigger.dataset.deleteLoad, deleteLoadTrigger.closest("tr"));
     }
   }
@@ -2656,6 +2915,10 @@
     const memberLoadInput = event.target.closest(
       "#member-load-member, #member-load-reference, #member-load-distance, #member-load-fx, #member-load-fy"
     );
+
+    if (nodeInput || memberMaterialField || supportField || loadField || materialModeInput || geometryModeInput || loadModeInput || globalMaterialInput || quickBuilderInput || memberLoadInput) {
+      clearStabilityWarning();
+    }
 
     if (nodeInput) {
       updateNodeField(nodeInput.dataset.nodeId, nodeInput.dataset.nodeField, nodeInput.value);
@@ -2730,6 +2993,10 @@
     const loadField = event.target.closest("[data-load-id][data-load-field='node']");
     const quickBuilderInput = event.target.closest("#quick-span-length, #quick-panel-count, #quick-height");
     const memberLoadInput = event.target.closest("#member-load-distance, #member-load-fx, #member-load-fy");
+
+    if (supportField || loadField || quickBuilderInput || memberLoadInput) {
+      clearStabilityWarning();
+    }
 
     if (supportField) {
       updateSupportField(

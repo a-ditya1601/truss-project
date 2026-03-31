@@ -90,6 +90,11 @@
     </aside>
 
     <div class="ui-stack-lg min-w-0">
+        <div id="center-toast" class="pointer-events-none fixed left-1/2 top-1/2 z-50 hidden -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-red-500/40 bg-[rgba(20,20,20,0.95)] px-5 py-4 text-sm font-medium text-white shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-md opacity-0 scale-95 translate-y-2 transition-all duration-300">
+            <span class="mr-2">⚠️</span>
+            <span id="center-toast-message"></span>
+        </div>
+        <div id="stability-notification" class="hidden rounded-2xl border px-4 py-3 text-sm font-medium" role="alert" aria-live="polite"></div>
         <section id="overview" class="ui-card ui-section">
             <div class="space-y-3">
                 <p class="ui-label">Overview</p>
